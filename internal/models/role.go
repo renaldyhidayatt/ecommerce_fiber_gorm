@@ -2,9 +2,9 @@ package models
 
 import "time"
 
-type Role struct {
-	RoleID    uint `gorm:"primaryKey"`
-	Role      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+type RoleModel struct {
+	RoleID    uint      `json:"role_id" gorm:"primaryKey"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

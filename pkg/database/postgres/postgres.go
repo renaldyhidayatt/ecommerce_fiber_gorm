@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"ecommerce_fiber/internal/models"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -17,7 +18,7 @@ func NewClient() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed error connect to database")
 	}
 
-	// err = db.AutoMigrate(&models.ModelCategory{}, &models.ModelCustomer{}, &models.ModelProduct{}, &models.ModelProductKeluar{}, &models.ModelProductMasuk{}, &models.ModelSale{}, &models.ModelSupplier{}, &models.ModelUser{})
+	err = db.AutoMigrate(&models.Cart{}, &models.Category{}, &models.Order{}, &models.OrderItems{}, &models.Product{}, &models.Review{}, &models.ShippingAddress{}, &models.Slider{}, &models.User{})
 
 	if err != nil {
 

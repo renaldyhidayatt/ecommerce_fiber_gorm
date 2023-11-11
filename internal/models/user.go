@@ -1,21 +1,15 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
-type UserModel struct {
+type User struct {
 	gorm.Model
-	Name     string `gorm:"column:name" json:"name"`
-	Email    string `gorm:"column:email;uniqueIndex" json:"email"`
-	Password string `gorm:"column:password" json:"-"`
-	IsActive bool   `gorm:"column:is_active;default:false" json:"is_active"`
-
-	Reviews []ReviewModel `gorm:"foreignKey:UserID" json:"reviews"`
-	Carts   []CartModel   `gorm:"foreignKey:UserID" json:"carts"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Name     string   `json:"name"`
+	Email    string   `json:"email" gorm:"unique"`
+	Password string   `json:"password" gorm:"type:varchar; not null"`
+	IsStaff  bool     `json:"is_staff"`
+	Reviews  []Review `json:"reviews" gorm:"many2many:user_reviews;"`
+	Carts    []Cart   `json:"carts" gorm:"many2many:user_carts;"`
 }
