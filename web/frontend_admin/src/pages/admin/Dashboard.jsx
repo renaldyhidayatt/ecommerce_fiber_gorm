@@ -35,11 +35,11 @@ function Dashboard(props) {
 
       const data = response.data.data;
 
-      setRevenueData(data.pendapatan);
+      setRevenueData(data.total_pendapatan);
       setUser(data.user);
       setOrder(data.order);
       setProduct(data.product);
-      setSumTotal(data.totalPendapatan);
+      setSumTotal(data.pendapatan);
     } catch (error) {
       console.log('Failed to fetch revenue data:', error);
     }

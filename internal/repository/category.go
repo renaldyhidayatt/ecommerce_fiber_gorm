@@ -53,7 +53,7 @@ func (r *categoryRepository) GetBySlug(slug string) (*models.Category, error) {
 
 	checkCategorySlug := db.Debug().Where("slug_category", slug).First(&category)
 
-	if checkCategorySlug.RowsAffected > 0 {
+	if checkCategorySlug.RowsAffected < 0 {
 
 		return &category, errors.New("error check category already")
 	}

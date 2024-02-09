@@ -4,6 +4,7 @@ import (
 	"ecommerce_fiber/internal/domain/requests/product"
 	"ecommerce_fiber/internal/models"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/gosimple/slug"
@@ -25,7 +26,7 @@ func (r *productRepository) GetAllProducts() (*[]models.Product, error) {
 
 	checkProduct := db.Debug().Find(&products)
 
-	if checkProduct.RowsAffected > 0 {
+	if checkProduct.RowsAffected < 1 {
 		return nil, errors.New("row kosong")
 	}
 
@@ -39,7 +40,7 @@ func (r *productRepository) GetProductBySlug(slug string) (*models.Product, erro
 
 	checkProductBySlug := db.Preload("Review").Debug().Where("slug_product = ?", slug).First(&product)
 
-	if checkProductBySlug.RowsAffected > 0 {
+	if checkProductBySlug.RowsAffected < 0 {
 		return nil, errors.New("failed get slug")
 	}
 
@@ -51,36 +52,41 @@ func (r *productRepository) CreateProduct(request *product.CreateProductRequest)
 
 	slugProduct := slug.Make(request.Name)
 
-	categoryid, err := strconv.Atoi(request.CategoryID)
-
-	db := r.db.Model(&product)
-
-	if err != nil {
-		return nil, errors.New("error convert string to int")
+	if request.CategoryID == "" {
+		return nil, errors.New("CategoryID is empty")
 	}
 
-	ratingStr := strconv.Itoa(*request.Rating)
-	ratingFloat, err := strconv.ParseFloat(ratingStr, 64)
+	fmt.Println(request.CategoryID)
+
+	categoryID, err := strconv.Atoi(request.CategoryID)
 	if err != nil {
-		return nil, errors.New("error convert string to float64")
+		return nil, errors.New("failed to convert CategoryID to int: " + err.Error())
 	}
+
+	ratingFloat := float64(*request.Rating)
 
 	product.Name = request.Name
+	product.Description = request.Description
 	product.SlugProduct = slugProduct
 	product.ImageProduct = request.FilePath
 	product.Price = request.Price
 	product.Weight = request.Weight
 	product.Brand = request.Brand
-	product.CategoryID = uint(categoryid)
+	product.CategoryID = uint(categoryID)
 	product.CountInStock = request.CountInStock
 	product.Rating = ratingFloat
 
-	addProduct := db.Debug().Create(&product).Commit()
-
-	if addProduct.RowsAffected < 1 {
-		return nil, errors.New("error create product")
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return nil, errors.New("failed to create product: " + tx.Error.Error())
 	}
 
+	if err := tx.Create(&product).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("failed to create product: " + err.Error())
+	}
+
+	tx.Commit()
 	return &product, nil
 }
 
@@ -91,7 +97,7 @@ func (r *productRepository) GetProductByID(productID int) (*models.Product, erro
 
 	checkProductById := db.Debug().Where("id", productID).First(&product)
 
-	if checkProductById.RowsAffected > 0 {
+	if checkProductById.RowsAffected < 0 {
 		return nil, errors.New("failed get id")
 	}
 
@@ -99,18 +105,22 @@ func (r *productRepository) GetProductByID(productID int) (*models.Product, erro
 }
 
 func (r *productRepository) MyUpdateQuantity(productID int, quantity int) (bool, error) {
-	dbProduct, err := r.GetProductByID(productID)
-	if err != nil {
+	var dbProduct models.Product
+	if err := r.db.Where("id = ?", productID).First(&dbProduct).Error; err != nil {
 		return false, err
 	}
 
-	if dbProduct != nil {
+	if dbProduct.ID != 0 {
 		dbProduct.CountInStock = quantity
-		if err := r.db.Save(dbProduct).Error; err != nil {
+
+		// Menyimpan perubahan ke database
+		if err := r.db.Save(&dbProduct).Error; err != nil {
 			return false, err
 		}
+
 		return true, nil
 	}
+
 	return false, nil
 }
 
@@ -119,46 +129,41 @@ func (r *productRepository) UpdateProduct(productID int, request *product.Update
 
 	slugProduct := slug.Make(request.Name)
 
-	dbProduct, err := r.GetProductByID(productID)
-	if err != nil {
-		return nil, err
-	}
-
-	categoryid, err := strconv.Atoi(request.CategoryID)
-
 	db := r.db.Model(&product)
 
+	if err := db.Debug().Where("id = ?", productID).First(&product).Error; err != nil {
+		return nil, errors.New("failed to find product: " + err.Error())
+	}
+
+	categoryID, err := strconv.Atoi(request.CategoryID)
 	if err != nil {
-		return nil, errors.New("error convert string to int")
+		return nil, errors.New("failed to convert CategoryID to int: " + err.Error())
 	}
 
 	ratingStr := strconv.Itoa(request.Rating)
-
 	ratingFloat, err := strconv.ParseFloat(ratingStr, 64)
 	if err != nil {
-		return nil, errors.New("error convert string to float64")
+		return nil, errors.New("failed to convert Rating to float64: " + err.Error())
 	}
 
-	if dbProduct != nil {
-		dbProduct.Name = request.Name
-		dbProduct.SlugProduct = slugProduct
-		dbProduct.ImageProduct = request.FilePath
-		dbProduct.Description = request.Description
-		dbProduct.Price = request.Price
-		dbProduct.Brand = request.Brand
-		dbProduct.Weight = request.Weight
-		dbProduct.CategoryID = uint(categoryid)
-		dbProduct.Brand = request.Brand
-		dbProduct.CountInStock = request.CountInStock
-		dbProduct.Rating = ratingFloat
+	product.Name = request.Name
+	product.SlugProduct = slugProduct
+	product.ImageProduct = request.FilePath
+	product.Description = request.Description
+	product.Price = request.Price
+	product.Brand = request.Brand
+	product.Weight = request.Weight
+	product.CategoryID = uint(categoryID)
+	product.Brand = request.Brand
+	product.CountInStock = request.CountInStock
+	product.Rating = ratingFloat
 
-		if err := db.Debug().Save(dbProduct).Error; err != nil {
-			return nil, err
-		}
-
-		return dbProduct, nil
+	// Menyimpan perubahan ke database
+	if err := db.Debug().Save(&product).Error; err != nil {
+		return nil, errors.New("failed to update product: " + err.Error())
 	}
-	return nil, nil
+
+	return &product, nil
 }
 
 func (r *productRepository) DeleteProduct(productID int) (*models.Product, error) {
@@ -180,4 +185,16 @@ func (r *productRepository) DeleteProduct(productID int) (*models.Product, error
 	}
 
 	return dbProduct, nil
+}
+
+func (r *productRepository) CountProduct() (int, error) {
+	var product models.Product
+
+	db := r.db.Model(&product)
+
+	var totalProduct int64
+
+	db.Debug().Model(&product).Count(&totalProduct)
+
+	return int(totalProduct), nil
 }

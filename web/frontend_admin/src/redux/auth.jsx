@@ -31,13 +31,13 @@ export const loginAction = createAsyncThunk(
   'auth/login',
   async (loginData, { rejectWithValue }) => {
     try {
-      const response = await myApi.post('/auth/token', loginData);
+      const response = await myApi.post('/auth/login', loginData);
 
-      localStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('accessToken', response.data.data.access_token);
 
-      localStorage.setItem('refreshToken', response.data.refresh);
+      localStorage.setItem('refreshToken', response.data.data.refresh_token);
 
-      return response.data;
+      return response.data.data;
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data);
@@ -58,19 +58,21 @@ export const updateTokenAsync = createAsyncThunk(
   'auth/updateToken',
   async (_, { getState, dispatch }) => {
     try {
-      const { refreshToken } = getState().authReducer;
+      const { refreshToken } = getState().loginReducer;
 
       if (!refreshToken) {
         return;
       }
 
       const response = await myApi.post('/auth/refresh-token', {
-        refresh: refreshToken,
+        refresh_token: refreshToken,
       });
 
-      const data = response.data;
+      localStorage.setItem('accessToken', response.data.data.access_token);
 
-      localStorage.setItem('accessToken', data);
+      localStorage.setItem('refreshToken', response.data.data.refresh_token);
+
+      localStorage.setItem('accessToken', data.access);
     } catch (error) {
       throw error;
     }
@@ -129,10 +131,11 @@ export const loginSlice = createSlice({
       })
       .addCase(loginAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.accessToken = action.payload.access;
-        state.refreshToken = action.payload.refresh;
 
-        state.user = decodeToken(action.payload.access);
+        state.accessToken = action.payload.data.access_token;
+        state.refreshToken = action.payload.data.refresh_token;
+
+        state.user = decodeToken(action.payload.data.access_token);
       })
       .addCase(loginAction.rejected, (state, action) => {
         state.loading = false;

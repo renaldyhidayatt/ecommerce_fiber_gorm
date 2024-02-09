@@ -2,8 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { myApi } from '../helpers/api';
 import jwtDecode from 'jwt-decode';
 
-const refreshToken = localStorage.getItem('refreshToken') || null;
-const accessToken = localStorage.getItem('accessToken') || null;
+let refreshToken;
+let accessToken;
+
+if (typeof window !== 'undefined') {
+  refreshToken = window.localStorage.getItem('refreshToken') || null;
+  accessToken = window.localStorage.getItem('accessToken') || null;
+}
 
 const initialUser = accessToken ? jwtDecode(accessToken) : null;
 
@@ -27,13 +32,13 @@ export const loginAction = createAsyncThunk(
   'auth/login',
   async (loginData, { rejectWithValue }) => {
     try {
-      const response = await myApi.post('/auth/token', loginData);
+      const response = await myApi.post('/auth/login', loginData);
 
-      localStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('accessToken', response.data.data.access_token);
 
-      localStorage.setItem('refreshToken', response.data.refresh);
+      localStorage.setItem('refreshToken', response.data.data.refresh_token);
 
-      return response.data;
+      return response.data.data;
     } catch (error) {
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data);
@@ -128,10 +133,10 @@ export const loginSlice = createSlice({
       })
       .addCase(loginAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.accessToken = action.payload.access;
-        state.refreshToken = action.payload.refresh;
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
 
-        state.user = jwtDecode(action.payload.access);
+        state.user = jwtDecode(action.payload.access_token);
       })
       .addCase(loginAction.rejected, (state, action) => {
         state.loading = false;

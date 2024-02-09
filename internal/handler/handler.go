@@ -6,6 +6,7 @@ import (
 	"ecommerce_fiber/pkg/cloudinary"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -16,6 +17,7 @@ type Handler struct {
 }
 
 func NewHandler(services *service.Service, cloudinary cloudinary.MyCloudinary, tokenManager auth.TokenManager) *Handler {
+
 	return &Handler{
 		services:     services,
 		cloudinary:   cloudinary,
@@ -27,6 +29,7 @@ func (h *Handler) Init() *fiber.App {
 	router := fiber.New()
 
 	router.Use(logger.New())
+	router.Use(cors.New())
 
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World")
@@ -40,6 +43,7 @@ func (h *Handler) Init() *fiber.App {
 func (h *Handler) InitApi(router *fiber.App) {
 	h.initAuthGroup(router)
 	h.initUserGroup(router)
+	h.initDashboardGroup(router)
 	h.initCategoryGroup(router)
 	h.initProductGroup(router)
 	h.initOrderGroup(router)

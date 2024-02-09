@@ -3,33 +3,43 @@ package service
 import (
 	"ecommerce_fiber/internal/domain/requests/cart"
 	"ecommerce_fiber/internal/domain/requests/product"
-	"ecommerce_fiber/internal/models"
+	pro "ecommerce_fiber/internal/domain/response/product"
+	"ecommerce_fiber/internal/mapper"
 	"ecommerce_fiber/internal/repository"
+	"ecommerce_fiber/pkg/logger"
 	"errors"
-	"fmt"
+
+	"go.uber.org/zap"
 )
 
 type productService struct {
 	repository repository.ProductRepository
+	logger     logger.Logger
+	mapper     mapper.ProductMapping
 }
 
-func NewProductService(repository repository.ProductRepository) *productService {
+func NewProductService(repository repository.ProductRepository, logger logger.Logger, mapper mapper.ProductMapping) *productService {
 	return &productService{
 		repository: repository,
+		logger:     logger,
+		mapper:     mapper,
 	}
 }
 
-func (s *productService) GetAllProduct() (*[]models.Product, error) {
+func (s *productService) GetAllProduct() ([]*pro.ProductResponse, error) {
 	res, err := s.repository.GetAllProducts()
 
 	if err != nil {
+		s.logger.Error("Error while getting all products", zap.Error(err))
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponses(res)
+
+	return mapper, nil
 }
 
-func (s *productService) CreateProduct(request *product.CreateProductRequest) (*models.Product, error) {
+func (s *productService) CreateProduct(request *product.CreateProductRequest) (*pro.ProductResponse, error) {
 	var schema product.CreateProductRequest
 
 	schema.Name = request.Name
@@ -38,40 +48,50 @@ func (s *productService) CreateProduct(request *product.CreateProductRequest) (*
 	schema.Price = request.Price
 	schema.CountInStock = request.CountInStock
 	schema.Weight = request.Weight
+	schema.Brand = request.Brand
 	schema.Rating = request.Rating
 	schema.FilePath = request.FilePath
 
 	res, err := s.repository.CreateProduct(&schema)
 
 	if err != nil {
-		return res, nil
+		s.logger.Error("Error while creating product:", zap.Error(err))
+		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponse(res)
+
+	return mapper, nil
 
 }
 
-func (s *productService) GetById(productID int) (*models.Product, error) {
+func (s *productService) GetById(productID int) (*pro.ProductResponse, error) {
 	res, err := s.repository.GetProductByID(productID)
 
 	if err != nil {
+		s.logger.Error("Error while getting product by id", zap.Error(err))
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponse(res)
+
+	return mapper, nil
 }
 
-func (s *productService) GetBySlug(slug string) (*models.Product, error) {
+func (s *productService) GetBySlug(slug string) (*pro.ProductResponse, error) {
 	res, err := s.repository.GetProductBySlug(slug)
 
 	if err != nil {
+		s.logger.Error("Error while getting product by slug", zap.Error(err))
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponse(res)
+
+	return mapper, nil
 }
 
-func (s *productService) UpdateProduct(id int, request *product.UpdateProductRequest) (*models.Product, error) {
+func (s *productService) UpdateProduct(id int, request *product.UpdateProductRequest) (*pro.ProductResponse, error) {
 
 	var schema product.UpdateProductRequest
 
@@ -86,21 +106,25 @@ func (s *productService) UpdateProduct(id int, request *product.UpdateProductReq
 
 	res, err := s.repository.UpdateProduct(id, request)
 	if err != nil {
-
+		s.logger.Error("Error while updating product", zap.Error(err))
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponse(res)
+
+	return mapper, nil
 }
 
-func (s *productService) DeleteProduct(productID int) (*models.Product, error) {
+func (s *productService) DeleteProduct(productID int) (*pro.ProductResponse, error) {
 	res, err := s.repository.DeleteProduct(productID)
 	if err != nil {
-		fmt.Printf("An error occurred: %v\n", err)
+		s.logger.Error("Error while deleting product", zap.Error(err))
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToProductResponse(res)
+
+	return mapper, nil
 }
 
 func (s *productService) UpdateQuantity(cart []*cart.CartCreateRequest) (bool, error) {
@@ -115,6 +139,7 @@ func (s *productService) UpdateQuantity(cart []*cart.CartCreateRequest) (bool, e
 		product, err := s.GetById(productID)
 
 		if err != nil {
+			s.logger.Error("Error while getting product by id", zap.Error(err))
 			return false, err
 		}
 

@@ -1,14 +1,17 @@
 import { useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginAction } from '@/redux/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { SweetAlert } from '@/helpers';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { loading } = useSelector((state) => state.loginReducer);
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -42,6 +45,14 @@ export default function LoginPage() {
         console.log('Login error:', error);
       });
   };
+
+  if (loading) {
+    return (
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <>

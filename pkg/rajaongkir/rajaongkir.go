@@ -13,7 +13,7 @@ type RajaOngkirAPI struct {
 
 func NewRajaOngkirAPI() *RajaOngkirAPI {
 	return &RajaOngkirAPI{
-		BaseURL: "api.rajaongkir.com",
+		BaseURL: "https://api.rajaongkir.com",
 		ApiKey:  viper.GetString("RAJAONGKIR_API"),
 	}
 }

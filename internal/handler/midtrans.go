@@ -9,7 +9,7 @@ import (
 func (h *Handler) initMidtransGroup(api *fiber.App) {
 	midtrans := api.Group("/api/midtrans")
 
-	midtrans.Get("/create-transaction", h.createTransaction)
+	midtrans.Post("/create-transaction", h.createTransaction)
 }
 
 func (h *Handler) createTransaction(c *fiber.Ctx) error {

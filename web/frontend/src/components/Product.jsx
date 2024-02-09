@@ -17,11 +17,11 @@ export default function Product({ products }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.length > 0 ? (
           products.map((row) => (
-            <Link to={`/product/${row.slug_product}`} key={row.id}>
+            <Link to={`/product/${row.slug}`} key={row.id}>
               <div className="p-4 border rounded-lg shadow-md bg-white">
                 <div className="relative overflow-hidden">
                   <img
-                    src={row.image_product}
+                    src={row.image_path}
                     alt={row.name}
                     className="w-full h-32 sm:h-40 object-cover rounded-lg"
                   />

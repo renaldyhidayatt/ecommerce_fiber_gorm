@@ -5,14 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const ProductPage = () => {
+  const dispatch = useDispatch();
   const product = useSelector((state) => state.productReducer);
 
-  const dispatch = useDispatch();
   const { products, loading, error } = product;
 
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filteredProduct, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     dispatch(fetchAllProducts());
@@ -25,16 +26,46 @@ const ProductPage = () => {
   }, [currentPage, products]);
 
   const handleDeleteProduct = (id) => {
-    dispatch(deleteProduct(id))
-      .then(() => {
-        SweetAlert.success('Success', 'Produk berhasil dihapus');
-
-        dispatch(fetchAllProducts());
-      })
-      .catch(() => {
-        SweetAlert.error('Error', 'Failed to remove item from Category');
-      });
+    if (window.confirm('Are you sure you want to delete this record?')) {
+      dispatch(deleteProduct(id))
+        .then(() => {
+          SweetAlert.success('Success', 'Produk berhasil dihapus').then(() => {
+            dispatch(fetchAllProducts());
+          });
+        })
+        .catch(() => {
+          SweetAlert.error('Error', 'Failed to remove item from Category');
+        });
+    }
   };
+
+  const handleSearch = (e) => {
+    setCurrentPage(1);
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredData = products.filter((product) => {
+    const searchCriteria = searchTerm.toLowerCase();
+    const minPrice = 10; // Harga minimum yang diinginkan
+    const maxPrice = 100; // Harga maksimum yang diinginkan
+
+    return (
+      product.name.toLowerCase().includes(searchCriteria) ||
+      product.brand.toLowerCase().includes(searchCriteria) ||
+      product.description.toLowerCase().includes(searchCriteria) ||
+      (product.price >= minPrice && product.price <= maxPrice)
+    );
+  });
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+  const displayedProduct = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const currentBlock = Math.ceil(currentPage / 5);
+
+  if (loading) {
+    return <h1>Loading</h1>;
+  }
 
   return (
     <div className="page-heading">
@@ -73,6 +104,15 @@ const ProductPage = () => {
             </button>
           </div>
           <div className="card-body">
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by name or description"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
             <table className="table table-striped" id="table1">
               <thead>
                 <tr>
@@ -90,7 +130,7 @@ const ProductPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((row, index) => (
+                {displayedProduct.map((row, index) => (
                   <tr key={row.id}>
                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{row.name}</td>
@@ -103,22 +143,22 @@ const ProductPage = () => {
                         height={100}
                       />
                     </td>
-                    <td>{row.category}</td>
+                    <td>{row.category_id}</td>
                     <td>{row.description}</td>
 
                     <td>{row.price}</td>
-                    <td>{row.countInStock}</td>
-                    <td>{row.created_at}</td>
-                    <td>{row.updated_at}</td>
+                    <td>{row.count_in_stock}</td>
+                    <td>{row.CreatedAt}</td>
+                    <td>{row.UpdatedAt}</td>
                     <td width="250">
                       <Link
-                        to={`/admin/product/edit/${row.id}`}
+                        to={`/admin/product/edit/${row.ID}`}
                         className="btn btn-success"
                       >
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDeleteProduct(row.id)}
+                        onClick={() => handleDeleteProduct(row.ID)}
                         className="btn btn-danger"
                       >
                         Delete
@@ -140,12 +180,25 @@ const ProductPage = () => {
                     Previous
                   </span>
                 </li>
-                <li className="page-item">
-                  <span className="page-link active">Page {currentPage}</span>
-                </li>
+                {[...Array(pageCount > 5 ? 5 : pageCount)].map((_, index) => (
+                  <li key={index} className="page-item">
+                    <span
+                      className={`page-link ${
+                        currentPage === index + 1 + (currentBlock - 1) * 5
+                          ? 'active'
+                          : ''
+                      }`}
+                      onClick={() =>
+                        setCurrentPage(index + 1 + (currentBlock - 1) * 5)
+                      }
+                    >
+                      {index + 1 + (currentBlock - 1) * 5}
+                    </span>
+                  </li>
+                ))}
                 <li
                   className={`page-item ${
-                    currentPage * itemsPerPage >= products.length
+                    currentPage * itemsPerPage >= filteredData.length
                       ? 'disabled'
                       : ''
                   }`}

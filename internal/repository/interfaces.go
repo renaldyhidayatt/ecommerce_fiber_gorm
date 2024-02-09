@@ -33,6 +33,9 @@ type OrderRepository interface {
 	CreateOrder(user_id int, request *order.CreateOrderRequest) (*models.Order, error)
 	GetByUser(userID int) (*[]models.Order, error)
 	GetByID(orderID int) (*models.Order, error)
+	CountOrder() (int, error)
+	CalculateYearlyRevenue() ([]int, error)
+	SumTotalPrice() (int, error)
 }
 
 type ProductRepository interface {
@@ -43,6 +46,7 @@ type ProductRepository interface {
 	MyUpdateQuantity(productID int, quantity int) (bool, error)
 	UpdateProduct(productID int, request *product.UpdateProductRequest) (*models.Product, error)
 	DeleteProduct(productID int) (*models.Product, error)
+	CountProduct() (int, error)
 }
 
 type ReviewRepository interface {
@@ -65,4 +69,5 @@ type UserRepository interface {
 	GetUserById(id int) (*models.User, error)
 	UpdateUserById(id int, updatedUser *user.UpdateUserRequest) (*models.User, error)
 	DeleteUserById(id int) (*models.User, error)
+	CountUser() (int, error)
 }

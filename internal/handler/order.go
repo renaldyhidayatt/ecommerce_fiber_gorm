@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func (h *Handler) initOrderGroup(api *fiber.App) {
@@ -17,9 +16,9 @@ func (h *Handler) initOrderGroup(api *fiber.App) {
 	order.Use(middleware.Protector())
 
 	order.Get("/", h.handleOrderAll)
-	order.Get("/create", h.handlerOrderCreate)
-	order.Get("/:id", h.handleOrderById)
+	order.Post("/create", h.handlerOrderCreate)
 	order.Get("/orderbyuser", h.handleOrderByUserId)
+	order.Get("/:id", h.handleOrderById)
 
 }
 
@@ -71,11 +70,23 @@ func (h *Handler) handleOrderById(c *fiber.Ctx) error {
 }
 
 func (h *Handler) handleOrderByUserId(c *fiber.Ctx) error {
-	userIdStr := c.Params("id")
-	userId, err := strconv.Atoi(userIdStr)
+	authorization := c.Get("Authorization")
+
+	us := authorization[7:]
+
+	id, err := h.tokenManager.ValidateToken(us)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": err.Error(),
+		})
+	}
+
+	userId, err := strconv.Atoi(id)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid order ID",
+			"message": "Invalid user ID",
 			"error":   true,
 		})
 	}
@@ -98,14 +109,23 @@ func (h *Handler) handleOrderByUserId(c *fiber.Ctx) error {
 
 func (h *Handler) handlerOrderCreate(c *fiber.Ctx) error {
 
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	id := claims["sub"].(string)
+	authorization := c.Get("Authorization")
+
+	us := authorization[7:]
+
+	id, err := h.tokenManager.ValidateToken(us)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": err.Error(),
+		})
+	}
 
 	userId, err := strconv.Atoi(id)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid order ID",
+			"message": "Invalid user ID",
 			"error":   true,
 		})
 	}

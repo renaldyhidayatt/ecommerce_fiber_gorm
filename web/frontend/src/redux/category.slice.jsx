@@ -6,7 +6,7 @@ export const fetchAllCategories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await myApi.get('/category');
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -17,7 +17,8 @@ export const createCategory = createAsyncThunk(
   'category/create',
   async (categoryData, { getState, rejectWithValue }) => {
     try {
-      const token = getState().loginReducer.token;
+      const token = getState().loginReducer.accessToken;
+
       const response = await myApi.post('/category/create', categoryData, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -4,15 +4,20 @@ import (
 	"ecommerce_fiber/internal/domain/requests/slider"
 	"ecommerce_fiber/internal/models"
 	"ecommerce_fiber/internal/repository"
+	"ecommerce_fiber/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 type sliderService struct {
 	repository repository.SliderRepository
+	logger     logger.Logger
 }
 
-func NewSliderService(repository repository.SliderRepository) *sliderService {
+func NewSliderService(repository repository.SliderRepository, logger logger.Logger) *sliderService {
 	return &sliderService{
 		repository: repository,
+		logger:     logger,
 	}
 }
 
@@ -20,6 +25,7 @@ func (s *sliderService) GetAllSliders() (*[]models.Slider, error) {
 	res, err := s.repository.GetAllSliders()
 
 	if err != nil {
+		s.logger.Error("Error while getting all sliders", zap.Error(err))
 		return nil, err
 	}
 
@@ -31,6 +37,7 @@ func (s *sliderService) GetSliderByID(sliderID int) (*models.Slider, error) {
 	res, err := s.repository.GetSliderByID(sliderID)
 
 	if err != nil {
+		s.logger.Error("Error while getting slider by id:", zap.Error(err))
 		return nil, err
 	}
 
@@ -46,6 +53,7 @@ func (s *sliderService) CreateSlider(request slider.CreateSliderRequest) (*model
 	res, err := s.repository.CreateSlider(schema)
 
 	if err != nil {
+		s.logger.Error("Error while creating slider:", zap.Error(err))
 		return nil, err
 	}
 
@@ -61,6 +69,7 @@ func (s *sliderService) UpdateSliderByID(sliderID int, request slider.UpdateSlid
 	res, err := s.repository.UpdateSliderByID(sliderID, schema)
 
 	if err != nil {
+		s.logger.Error("Error while updating slider:", zap.Error(err))
 		return nil, err
 	}
 
@@ -71,6 +80,7 @@ func (s *sliderService) DeleteSliderByID(sliderID int) (*models.Slider, error) {
 	res, err := s.repository.DeleteSliderByID(sliderID)
 
 	if err != nil {
+		s.logger.Error("Error while deleting slider:", zap.Error(err))
 		return nil, err
 	}
 

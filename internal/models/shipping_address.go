@@ -11,5 +11,4 @@ type ShippingAddress struct {
 	Negara   string `json:"negara"`
 	Kota     string `json:"kota"`
 	OrderID  uint   `json:"order_id"`
-	Order    Order  `json:"order"`
 }

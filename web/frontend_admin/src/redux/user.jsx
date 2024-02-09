@@ -3,9 +3,15 @@ import { myApi } from '@/helpers/api';
 
 export const createUser = createAsyncThunk(
   'users/create',
-  async (createUserData, { rejectWithValue }) => {
+  async (createUserData, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.post('/user/create', createUserData);
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.post('/user/create', createUserData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -15,10 +21,16 @@ export const createUser = createAsyncThunk(
 
 export const fetchUsers = createAsyncThunk(
   'users/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.get('/user');
-      return response.data;
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.get('/user', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -27,9 +39,15 @@ export const fetchUsers = createAsyncThunk(
 
 export const fetchUserById = createAsyncThunk(
   'users/fetchById',
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.get(`/user/${id}`);
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.get(`/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -39,10 +57,15 @@ export const fetchUserById = createAsyncThunk(
 
 export const updateUserById = createAsyncThunk(
   'users/updateById',
-  async ({ id, formData }, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.put(`/user/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.put(`/user/update/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       return response.data;
@@ -54,9 +77,15 @@ export const updateUserById = createAsyncThunk(
 
 export const deleteUserById = createAsyncThunk(
   'users/deleteById',
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      await myApi.delete(`/user/${id}`);
+      const { accessToken } = getState().loginReducer;
+
+      await myApi.delete(`/user/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return id;
     } catch (error) {
       return rejectWithValue(error.response.data);

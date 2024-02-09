@@ -84,7 +84,7 @@ const Navbar = () => {
                     onClick={toggleDropdown}
                     aria-expanded={isDropdownOpen ? 'true' : 'false'}
                   >
-                    {user.name}
+                    {user.firstname}
                     <svg
                       className={`w-5 h-5 ml-1 ${
                         isDropdownOpen ? 'transform rotate-180' : ''

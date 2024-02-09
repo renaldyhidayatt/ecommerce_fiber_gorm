@@ -12,15 +12,11 @@ export const placeOrder = createAsyncThunk(
         return rejectWithValue('accessToken is null');
       }
 
-      const response = await myApi.post(
-        '/order/create-order-place',
-        orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await myApi.post('/order/create', orderData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       return response.data;
     } catch (error) {
@@ -41,14 +37,17 @@ export const getOrdersByUserId = createAsyncThunk(
         return rejectWithValue('accessToken is null');
       }
       //
-      const response = await myApi.get(`/order/get-order-by-user`, {
+      const response = await myApi.get(`/order/orderbyuser`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      return response.data;
+      console.log('response:', response.data.data);
+
+      return response.data.data;
     } catch (error) {
+      console.log('error:', error.response.data);
       return rejectWithValue(error.response.data);
     }
   }
@@ -65,13 +64,15 @@ export const getOrderById = createAsyncThunk(
         return rejectWithValue('accessToken is null');
       }
 
-      const response = await myApi.get(`/order/get-order-by-id/${id}`, {
+      const response = await myApi.get(`/order/${id}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      return response.data;
+      console.log('response:', response.data.data);
+
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

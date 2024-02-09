@@ -5,15 +5,14 @@ export const fetchOrdersAsync = createAsyncThunk(
   'order/fetchOrders',
   async (_, { rejectWithValue, getState }) => {
     try {
-      const { accessToken } = getState().loginReducer; // Replace with your actual auth reducer key
+      const { accessToken } = getState().loginReducer;
       const response = await myApi.get('/order', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      console.log(accessToken);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -25,7 +24,7 @@ export const deleteOrderAsync = createAsyncThunk(
   async (orderId, { rejectWithValue, getState }) => {
     try {
       const { accessToken } = getState().loginReducer; // Replace with your actual auth reducer key
-      const response = await myApi.delete(`/order/delete/${orderId}`, {
+      const response = await myApi.delete(`/order/delete-order/${orderId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

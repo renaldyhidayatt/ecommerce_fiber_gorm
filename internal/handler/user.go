@@ -85,7 +85,7 @@ func (h *Handler) handleCreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	res, err := h.services.User.Register(&body)
+	res, err := h.services.User.CreateUser(&body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

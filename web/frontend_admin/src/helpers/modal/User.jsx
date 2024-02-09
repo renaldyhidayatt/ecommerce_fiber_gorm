@@ -1,11 +1,13 @@
-import { createUser } from '@/redux/user';
+import { createUser, fetchUsers } from '@/redux/user';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import SweetAlert from '@/helpers/sweetalert';
 
 export default function ModalUser() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm_password, setConfirmPassword] = useState('');
 
   const dispatch = useDispatch();
 
@@ -21,15 +23,37 @@ export default function ModalUser() {
     setPassword(e.target.value);
   };
 
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (password !== confirm_password) {
+      SweetAlert.error(
+        'Error!!!',
+        'Password and Confirm Password do not match'
+      );
+      return;
+    }
+
     const formData = {
       name: name,
       email: email,
       password: password,
+      confirm_password: confirm_password,
     };
 
-    dispatch(createUser(formData));
+    dispatch(createUser(formData))
+      .then(() => {
+        SweetAlert.success('Successfully', 'User created successfully!').then(
+          () => dispatch(fetchUsers())
+        );
+      })
+      .catch(() => {
+        SweetAlert.error('Error!!', 'Failed to create user. Please try again.');
+      });
   };
 
   return (
@@ -96,6 +120,19 @@ export default function ModalUser() {
                   className="form-control"
                   value={password}
                   onChange={handleChangePassword}
+                />
+              </div>
+
+              <label htmlFor="confirm_password">Confirm Password: </label>
+              <div className="form-group">
+                <input
+                  id="confirm_password"
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  className="form-control"
+                  value={confirm_password}
+                  onChange={handleConfirmPasswordChange}
                 />
               </div>
             </div>

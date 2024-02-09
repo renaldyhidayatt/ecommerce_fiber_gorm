@@ -23,7 +23,7 @@ func (r *sliderRepository) GetAllSliders() (*[]models.Slider, error) {
 
 	checkSlider := db.Debug().Find(&sliders)
 
-	if checkSlider.RowsAffected > 0 {
+	if checkSlider.RowsAffected < 0 {
 		return nil, errors.New("row kosong")
 	}
 
@@ -37,8 +37,8 @@ func (r *sliderRepository) GetSliderByID(sliderID int) (*models.Slider, error) {
 
 	checkSliderById := db.Debug().Where("id = ?", sliderID).First(&slider)
 
-	if checkSliderById.RowsAffected > 0 {
-		return nil, errors.New("error")
+	if checkSliderById.RowsAffected < 0 {
+		return nil, errors.New("failed get id")
 	}
 
 	return &slider, nil

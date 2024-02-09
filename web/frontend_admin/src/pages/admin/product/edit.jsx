@@ -1,6 +1,6 @@
 import { fetchAllCategories } from '@/redux/category';
 import { fetchProductById, updateProductById } from '@/redux/product';
-
+import { SweetAlert } from '@/helpers';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -109,8 +109,9 @@ const EditProductPage = () => {
     }
 
     dispatch(updateProductById({ id, form })).then((data) => {
-      console.log('update: ', data);
-      navigate('/admin/product');
+      SweetAlert.success('Success', 'Product berhasil diupdate').then(() => {
+        navigate('/admin/product');
+      });
     });
   };
 
@@ -130,13 +131,13 @@ const EditProductPage = () => {
       setFormData({
         ...formData,
         name: product.name,
-        price: product.price.toString(),
+        price: product.price,
         categoryId: product.category,
         description: product.description,
         brand: product.brand,
         weight: product.weight,
         rating: product.rating,
-        countInStock: product.countInStock.toString(),
+        countInStock: product.count_in_stock,
       });
     }
   }, [product]);
@@ -226,7 +227,7 @@ const EditProductPage = () => {
                     <option value="">Pilih Kategori</option>
                     {categoryState &&
                       categoryState.categories.map((k) => (
-                        <option key={k.id} value={k.id}>
+                        <option key={k.ID} value={k.ID}>
                           {k.name}
                         </option>
                       ))}

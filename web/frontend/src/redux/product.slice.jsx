@@ -5,8 +5,8 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await myApi.get('/product/recom');
-      return response.data;
+      const response = await myApi.get('/product');
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -30,7 +30,7 @@ export const fetchProductBySlug = createAsyncThunk(
   async (slug, { rejectWithValue }) => {
     try {
       const response = await myApi.get(`/product/slug/${slug}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -117,7 +117,7 @@ export const deleteProductById = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      return 
+      return;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

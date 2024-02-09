@@ -12,7 +12,7 @@ export const fetchProvinces = createAsyncThunk(
         return rejectWithValue('accessToken is null');
       }
 
-      const response = await myApi.get('/rajaongkir/get-provinces', {
+      const response = await myApi.get('/rajaongkir/provinsi', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -35,7 +35,7 @@ export const fetchCities = createAsyncThunk(
         return rejectWithValue('accessToken is null');
       }
 
-      const response = await myApi.get(`/rajaongkir/get-city/${provId}`, {
+      const response = await myApi.get(`/rajaongkir/city/${provId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -60,7 +60,7 @@ export const calculateShippingCost = createAsyncThunk(
       }
 
       const response = await myApi.post(
-        `/rajaongkir/get-shipping-cost`,
+        `/rajaongkir/cost`,
         {
           asal,
           tujuan,

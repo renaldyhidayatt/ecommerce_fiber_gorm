@@ -13,6 +13,7 @@ func (h *Handler) initProductGroup(api *fiber.App) {
 
 	product.Get("/hello", h.handlerProductHello)
 	product.Get("/", h.handleProductAll)
+	product.Get("/slug/:slug", h.handleProductFindBySlug)
 	product.Get("/:id", h.handleProductById)
 
 	product.Use(middleware.Protector())
@@ -46,9 +47,10 @@ func (h *Handler) handleProductAll(c *fiber.Ctx) error {
 func (h *Handler) handleProductById(c *fiber.Ctx) error {
 	productIDStr := c.Params("id")
 	productId, err := strconv.Atoi(productIDStr)
+
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid user ID",
+			"message": "Invalid product ID",
 			"error":   true,
 		})
 	}
@@ -70,6 +72,25 @@ func (h *Handler) handleProductById(c *fiber.Ctx) error {
 
 }
 
+func (h *Handler) handleProductFindBySlug(c *fiber.Ctx) error {
+	slug := c.Params("slug")
+
+	res, err := h.services.Product.GetBySlug(slug)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+			"error":   true,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":    "product data already to use",
+		"statusCode": fiber.StatusOK,
+		"data":       res,
+	})
+}
+
 func (h *Handler) handleProductCreate(c *fiber.Ctx) error {
 	price, err := strconv.Atoi(c.FormValue("price"))
 	if err != nil {
@@ -79,7 +100,7 @@ func (h *Handler) handleProductCreate(c *fiber.Ctx) error {
 		})
 	}
 
-	countInStock, err := strconv.Atoi(c.FormValue("count_in_stock"))
+	countInStock, err := strconv.Atoi(c.FormValue("countInStock"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid convert countInStock",
@@ -105,15 +126,16 @@ func (h *Handler) handleProductCreate(c *fiber.Ctx) error {
 
 	createReq := product.CreateProductRequest{
 		Name:         c.FormValue("name"),
-		CategoryID:   c.FormValue("category_id"),
+		CategoryID:   c.FormValue("category"),
 		Description:  c.FormValue("description"),
+		Brand:        c.FormValue("brand"),
 		Price:        price,
 		CountInStock: countInStock,
 		Weight:       weight,
 		Rating:       &rating,
 	}
 
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("image_product")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "File upload failed"})
 	}
@@ -130,6 +152,13 @@ func (h *Handler) handleProductCreate(c *fiber.Ctx) error {
 	}
 
 	createReq.FilePath = imageURL
+
+	if err := createReq.Validate(); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
 
 	res, err := h.services.Product.CreateProduct(&createReq)
 
@@ -162,7 +191,7 @@ func (h *Handler) handleProductUpdate(c *fiber.Ctx) error {
 		})
 	}
 
-	countInStock, err := strconv.Atoi(c.FormValue("count_in_stock"))
+	countInStock, err := strconv.Atoi(c.FormValue("countInStock"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid convert countInStock",
@@ -188,15 +217,16 @@ func (h *Handler) handleProductUpdate(c *fiber.Ctx) error {
 
 	updateReq := product.UpdateProductRequest{
 		Name:         c.FormValue("name"),
-		CategoryID:   c.FormValue("category_id"),
+		CategoryID:   c.FormValue("category"),
 		Description:  c.FormValue("description"),
-		Price:        price,
+		Brand:        c.FormValue("brand"),
 		CountInStock: countInStock,
+		Price:        price,
 		Weight:       weight,
 		Rating:       rating,
 	}
 
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("image_product")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "File upload failed"})
 	}
@@ -213,6 +243,13 @@ func (h *Handler) handleProductUpdate(c *fiber.Ctx) error {
 	}
 
 	updateReq.FilePath = imageURL
+
+	if err := updateReq.Validate(); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
 
 	res, err := h.services.Product.UpdateProduct(productId, &updateReq)
 

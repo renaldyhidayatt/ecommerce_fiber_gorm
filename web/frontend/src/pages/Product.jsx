@@ -28,7 +28,7 @@ export default function ProductPage() {
       if (
         isNaN(parsedQuantity) ||
         parsedQuantity <= 0 ||
-        parsedQuantity > product?.countInStock
+        parsedQuantity > product?.count_in_stock
       ) {
         setCartError('Invalid quantity');
         return;
@@ -38,9 +38,9 @@ export default function ProductPage() {
         addToCart({
           name: product.name,
           price: product.price.toString(),
-          image: product.image_product,
+          image_product: product.image_product,
           quantity: parsedQuantity,
-          product: product.id,
+          product_id: product.id,
           weight: product.weight,
         })
       );
@@ -56,6 +56,8 @@ export default function ProductPage() {
     if (slug) {
       dispatch(fetchProductBySlug(slug));
     }
+
+    console.log('Image product', product);
   }, []);
 
   return (
@@ -67,7 +69,7 @@ export default function ProductPage() {
       ) : (
         <>
           {product && (
-            <div key={product.id}>
+            <div key={product.ID}>
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/2">
                   <div className="bg-white p-4 rounded-md shadow-md">
@@ -113,13 +115,15 @@ export default function ProductPage() {
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
                       >
-                        {[...Array(product.countInStock).keys()].map((x, i) => {
-                          return <option value={i + 1}>{i + 1}</option>;
-                        })}
+                        {[...Array(product.count_in_stock).keys()].map(
+                          (x, i) => {
+                            return <option value={i + 1}>{i + 1}</option>;
+                          }
+                        )}
                       </select>
                     </div>
                     <hr />
-                    {product.countInStock > 0 ? (
+                    {product.count_in_stock > 0 ? (
                       <button
                         className="bg-gray-800 text-white py-2 px-4 rounded-md mt-6"
                         onClick={addCart}

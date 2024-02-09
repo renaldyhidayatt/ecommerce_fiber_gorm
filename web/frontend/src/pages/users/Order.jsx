@@ -7,7 +7,7 @@ import { IsError } from '../../components/ISError';
 
 export default function OrderPage() {
   const orderState = useSelector((state) => state.orderReducer);
-  const user = useSelector((state) => state.authReducer.user);
+  const user = useSelector((state) => state.loginReducer.user);
 
   const { orders, getOrdersByUserIdError, getOrdersByUserIdLoading } =
     orderState;
@@ -43,14 +43,14 @@ export default function OrderPage() {
                 orders.map((order) => {
                   return (
                     <tr
-                      key={order.id}
+                      key={order.ID}
                       onClick={() => {
-                        window.location = `/user/orderinfo/${order.id}`;
+                        window.location = `/user/orderinfo/${order.ID}`;
                       }}
                     >
-                      <td>{order.id}</td>
-                      <td>{order.orderAmount}</td>
-                      <td>{order.created_at.substring(0, 10)}</td>
+                      <td>{order.ID}</td>
+                      <td>{order.total_price}</td>
+                      <td>{order.CreatedAt.substring(0, 10)}</td>
                       <td>{order.transactionId}</td>
                       <td>
                         {order.isDelivered ? (

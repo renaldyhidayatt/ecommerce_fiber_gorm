@@ -20,5 +20,6 @@ func NewRepository(db *gorm.DB) *Repositories {
 		Cart:     NewCartRepository(db),
 		Order:    NewOrderRepository(db),
 		Review:   NewReviewRepository(db),
+		Slider:   NewSliderRepository(db),
 	}
 }

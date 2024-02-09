@@ -6,13 +6,16 @@ export const fetchAllCategories = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { accessToken } = getState().loginReducer;
+
+      console.log('Access Token:', accessToken);
+
       const response = await myApi.get('/category', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -45,7 +48,7 @@ export const createCategory = createAsyncThunk(
       const response = await myApi.post('/category/create', createCategory, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${accessToken}`, // Include the bearer token
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       return response.data;
@@ -78,6 +81,7 @@ export const deleteCategoryById = createAsyncThunk(
   async (id, { rejectWithValue, getState }) => {
     try {
       const { accessToken } = getState().loginReducer;
+
       const response = await myApi.delete(`/category/${id}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,

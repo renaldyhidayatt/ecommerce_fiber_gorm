@@ -1,10 +1,13 @@
 import { createCategory } from '@/redux/category';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import SweetAlert from '../sweetalert';
+import { fetchAllCategories } from '@/redux/category';
 
 function ModalCategory() {
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     image: null,
   });
 
@@ -14,6 +17,13 @@ function ModalCategory() {
     setFormData({
       ...formData,
       name: e.target.value,
+    });
+  };
+
+  const handleDescriptionChange = (e) => {
+    setFormData({
+      ...formData,
+      description: e.target.value,
     });
   };
 
@@ -35,7 +45,19 @@ function ModalCategory() {
       form.append('image_category', formData.image);
     }
 
-    dispatch(createCategory(form));
+    dispatch(createCategory(form))
+      .then(() => {
+        SweetAlert.success(
+          'Successfully',
+          'Category created successfully'
+        ).then(() => dispatch(fetchAllCategories()));
+      })
+      .catch(() => {
+        SweetAlert.error(
+          'Error!!!',
+          'Failed to create Category. Please try again.'
+        );
+      });
   };
 
   return (

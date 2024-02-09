@@ -4,6 +4,7 @@ import (
 	"ecommerce_fiber/internal/domain/requests/cart"
 	"ecommerce_fiber/internal/models"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -25,7 +26,7 @@ func (r *cartRepository) FindAllByUserID(userID int) (*[]models.Cart, error) {
 	checkCartByUserId := db.Debug().First(&carts, "user_id", userID)
 
 	if checkCartByUserId.RowsAffected < 1 {
-		return nil, errors.New("error user id")
+		return nil, errors.New("error not found cart")
 	}
 
 	return &carts, nil
@@ -34,7 +35,9 @@ func (r *cartRepository) FindAllByUserID(userID int) (*[]models.Cart, error) {
 func (r *cartRepository) Create(cartRequest *cart.CartCreateRequest) (*models.Cart, error) {
 	var cartModel models.Cart
 
-	db := r.db.Model(cartModel)
+	fmt.Println("cart request", cartRequest.Weight)
+
+	db := r.db.Model(&cartModel)
 
 	cartModel.Name = cartRequest.Name
 	cartModel.Price = cartRequest.Price
@@ -44,9 +47,12 @@ func (r *cartRepository) Create(cartRequest *cart.CartCreateRequest) (*models.Ca
 	cartModel.ProductID = uint(cartRequest.ProductID)
 	cartModel.UserID = uint(cartRequest.UserID)
 
-	if err := db.Debug().Create(cartModel).Error; err != nil {
-		return nil, err
+	addCart := db.Debug().Create(&cartModel).Commit()
+
+	if addCart.RowsAffected < 1 {
+		return nil, errors.New("error creating cart")
 	}
+
 	return &cartModel, nil
 }
 
@@ -57,8 +63,14 @@ func (r *cartRepository) Delete(cartID int) (*models.Cart, error) {
 
 	checkCartById := db.Debug().First(&cart, "id=?", cartID)
 
-	if checkCartById.RowsAffected > 0 {
+	if checkCartById.RowsAffected < 0 {
 		return &cart, errors.New("error not found cart")
+	}
+
+	deleteCart := db.Debug().Delete(&cart)
+
+	if deleteCart.Error != nil {
+		return nil, deleteCart.Error
 	}
 
 	return &cart, nil

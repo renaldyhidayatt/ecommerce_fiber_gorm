@@ -1,5 +1,3 @@
-'use client';
-
 import { SweetAlert } from '@/helpers';
 import { deleteSliderById, fetchAllSliders } from '@/redux/slider';
 import { useEffect } from 'react';
@@ -15,7 +13,7 @@ const SliderPage = () => {
 
   const handleDeleteSlider = (id) => {
     const confirmed = window.confirm(
-      'Apakah Anda yakin ingin menghapus rekaman ini?'
+      'Are you sure you want to delete this record?'
     );
     if (confirmed) {
       dispatch(deleteSliderById(id))
@@ -103,8 +101,8 @@ const SliderPage = () => {
               <tbody>
                 {sliders &&
                   sliders.map((row) => (
-                    <tr key={row.id}>
-                      <td>{row.id}</td>
+                    <tr key={row.ID}>
+                      <td>{row.ID}</td>
                       <td>{row.name}</td>
                       <td>
                         <img
@@ -114,17 +112,17 @@ const SliderPage = () => {
                           height={100}
                         />
                       </td>
-                      <td>{row.created_at}</td>
-                      <td>{row.updated_at}</td>
+                      <td>{row.CreatedAt}</td>
+                      <td>{row.UpdatedAt}</td>
                       <td width="250">
                         <Link
-                          to={`/admin/slider/edit/${row.id}`}
+                          to={`/admin/slider/edit/${row.ID}`}
                           className="btn btn-success"
                         >
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDeleteSlider(row.id)}
+                          onClick={() => handleDeleteSlider(row.ID)}
                           className="btn btn-danger"
                         >
                           Delete

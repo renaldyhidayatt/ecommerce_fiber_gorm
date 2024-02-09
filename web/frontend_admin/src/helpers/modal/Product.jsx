@@ -2,6 +2,8 @@ import { fetchAllCategories } from '@/redux/category';
 import { createProduct } from '@/redux/product';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import SweetAlert from '../sweetalert';
+import { fetchAllProducts } from '@/redux/product';
 
 const ModalProduct = (props) => {
   const [formData, setFormData] = useState({
@@ -95,16 +97,32 @@ const ModalProduct = (props) => {
     form.append('name', formData.name);
     form.append('category', formData.categoryId);
     form.append('description', formData.description);
-    form.append('countInStock', formData.countInStock);
     form.append('brand', formData.brand);
+    form.append('price', formData.price);
+    form.append('countInStock', formData.countInStock);
     form.append('weight', formData.weight);
     form.append('rating', formData.rating);
-    form.append('price', formData.price);
     if (formData.image) {
       form.append('image_product', formData.image);
     }
 
-    dispatch(createProduct(form));
+    console.log(
+      `${formData.name}, ${formData.categoryId}, ${formData.description}, ${formData.brand}, ${formData.price}, ${formData.countInStock}, ${formData.weight}, ${formData.rating}, ${formData.image}`
+    );
+
+    dispatch(createProduct(form))
+      .then(() => {
+        SweetAlert.success(
+          'Successfully',
+          'Product created successfully!'
+        ).then(() => dispatch(fetchAllProducts()));
+      })
+      .catch(() => {
+        SweetAlert.error(
+          'Error!!!',
+          'Failed to create product. Please try again.'
+        );
+      });
   };
 
   return (
@@ -169,7 +187,7 @@ const ModalProduct = (props) => {
                   <option value="">Pilih Kategori</option>
                   {categories &&
                     categories.map((k) => (
-                      <option key={k.id} value={k.id}>
+                      <option key={k.ID} value={k.ID}>
                         {k.name}
                       </option>
                     ))}

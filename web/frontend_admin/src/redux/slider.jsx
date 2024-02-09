@@ -3,10 +3,16 @@ import { myApi } from '@/helpers/api';
 
 export const fetchAllSliders = createAsyncThunk(
   'sliders/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.get('/sliders');
-      return response.data;
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.get('/slider', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -15,10 +21,16 @@ export const fetchAllSliders = createAsyncThunk(
 
 export const fetchSliderById = createAsyncThunk(
   'sliders/fetchById',
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.get(`/sliders/${id}`);
-      return response.data;
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.get(`/slider/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -27,10 +39,15 @@ export const fetchSliderById = createAsyncThunk(
 
 export const createSlider = createAsyncThunk(
   'sliders/create',
-  async (formData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.post('/sliders/create', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.post('/slider/create', formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return response.data;
     } catch (error) {
@@ -41,10 +58,15 @@ export const createSlider = createAsyncThunk(
 
 export const updateSliderById = createAsyncThunk(
   'sliders/updateById',
-  async ({ id, formData }, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.put(`/sliders/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const { accessToken } = getState().loginReducer;
+
+      const response = await myApi.put(`/slider/update/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return response.data;
     } catch (error) {

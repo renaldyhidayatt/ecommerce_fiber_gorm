@@ -1,6 +1,8 @@
 import { createSlider } from '@/redux/slider';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { fetchAllSliders } from '@/redux/slider';
+import SweetAlert from '../sweetalert';
 
 export default function ModalSlider(props) {
   const [nama, setNama] = useState('');
@@ -24,10 +26,21 @@ export default function ModalSlider(props) {
 
     formData.append('name', nama);
     if (image) {
-      formData.append('image', image);
+      formData.append('file', image);
     }
 
-    dispatch(createSlider(formData));
+    dispatch(createSlider(formData))
+      .then(() => {
+        SweetAlert.success('Successfully', 'Slider created successfully').then(
+          () => dispatch(fetchAllSliders())
+        );
+      })
+      .catch(() => {
+        SweetAlert.error(
+          'Error!!!',
+          'Failed to create slider. Please try again'
+        );
+      });
   };
 
   return (

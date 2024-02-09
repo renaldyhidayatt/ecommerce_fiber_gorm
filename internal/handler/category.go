@@ -13,6 +13,7 @@ func (h *Handler) initCategoryGroup(api *fiber.App) {
 
 	category.Get("/hello", h.handlerHelloCategory)
 	category.Get("/", h.handleCategoryAll)
+	category.Get("/slug/:slug", h.handleCategorySlug)
 
 	category.Use(middleware.Protector())
 	category.Get("/:id", h.handleCategoryById)
@@ -68,10 +69,29 @@ func (h *Handler) handleCategoryById(c *fiber.Ctx) error {
 	})
 }
 
+func (h *Handler) handleCategorySlug(c *fiber.Ctx) error {
+	slug := c.Params("slug")
+
+	res, err := h.services.Category.GetBySlug(slug)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+			"error":   true,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":    "category data already to use",
+		"statusCode": fiber.StatusOK,
+		"data":       res,
+	})
+}
+
 func (h *Handler) handlerCategoryCreate(c *fiber.Ctx) error {
 	name := c.FormValue("name")
 
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("image_category")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "File upload failed"})
 	}

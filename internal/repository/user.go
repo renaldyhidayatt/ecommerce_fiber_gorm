@@ -79,7 +79,7 @@ func (r *userRepository) GetUserById(id int) (*models.User, error) {
 
 	checkCategoryById := db.Debug().Where("id = ?", id).First(&user)
 
-	if checkCategoryById.RowsAffected > 0 {
+	if checkCategoryById.RowsAffected < 0 {
 		return &user, errors.New("error not found user")
 	}
 
@@ -125,4 +125,16 @@ func (r *userRepository) DeleteUserById(id int) (*models.User, error) {
 
 	return res, nil
 
+}
+
+func (r *userRepository) CountUser() (int, error) {
+	var user models.User
+
+	db := r.db.Model(user)
+
+	var totalUser int64
+
+	db.Debug().Model(&user).Count(&totalUser)
+
+	return int(totalUser), nil
 }

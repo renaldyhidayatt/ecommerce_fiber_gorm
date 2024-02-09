@@ -5,8 +5,8 @@ export const fetchAllSliders = createAsyncThunk(
   'slider/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await myApi.get('/sliders');
-      return response.data;
+      const response = await myApi.get('/slider');
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -18,7 +18,7 @@ export const createSlider = createAsyncThunk(
   async (sliderData, { getState, rejectWithValue }) => {
     try {
       const token = getState().loginReducer.token;
-      const response = await myApi.post('/sliders/create', sliderData, {
+      const response = await myApi.post('/slider/create', sliderData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -35,7 +35,7 @@ export const updateSlider = createAsyncThunk(
   async ({ id, sliderData }, { getState, rejectWithValue }) => {
     try {
       const token = getState().loginReducer.token;
-      const response = await myApi.put(`/sliders/update/${id}`, sliderData, {
+      const response = await myApi.put(`/slider/update/${id}`, sliderData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +52,7 @@ export const deleteSlider = createAsyncThunk(
   async ({ id }, { getState, rejectWithValue }) => {
     try {
       const token = getState().loginReducer.token;
-      const response = await myApi.delete(`/sliders/${id}`, {
+      const response = await myApi.delete(`/slider/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

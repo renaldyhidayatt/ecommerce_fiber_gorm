@@ -2,14 +2,16 @@ package handler
 
 import (
 	"ecommerce_fiber/internal/domain/requests/cart"
+	"ecommerce_fiber/internal/middleware"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func (h *Handler) initCartGroup(api *fiber.App) {
 	cartGroup := api.Group("/api/cart")
+
+	cartGroup.Use(middleware.Protector())
 
 	cartGroup.Get("/", h.handleGetUserCarts)
 	cartGroup.Post("/create", h.handleCartCreate)
@@ -18,10 +20,18 @@ func (h *Handler) initCartGroup(api *fiber.App) {
 }
 
 func (h *Handler) handleGetUserCarts(c *fiber.Ctx) error {
+	authorization := c.Get("Authorization")
 
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	id := claims["sub"].(string)
+	us := authorization[7:]
+
+	id, err := h.tokenManager.ValidateToken(us)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": err.Error(),
+		})
+	}
 
 	userId, err := strconv.Atoi(id)
 	if err != nil {
@@ -29,7 +39,6 @@ func (h *Handler) handleGetUserCarts(c *fiber.Ctx) error {
 			"message": "Invalid user ID",
 			"error":   true,
 		})
-
 	}
 
 	res, err := h.services.Cart.FindAllByUserID(userId)
@@ -49,8 +58,30 @@ func (h *Handler) handleGetUserCarts(c *fiber.Ctx) error {
 }
 
 func (h *Handler) handleCartCreate(c *fiber.Ctx) error {
+	authorization := c.Get("Authorization")
+
+	us := authorization[7:]
+
+	id, err := h.tokenManager.ValidateToken(us)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error":   true,
+			"message": err.Error(),
+		})
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid user ID",
+			"error":   true,
+		})
+	}
 
 	var body cart.CartCreateRequest
+
+	body.UserID = userId
 
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

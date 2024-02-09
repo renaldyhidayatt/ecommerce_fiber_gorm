@@ -5,12 +5,14 @@ go 1.21.4
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.6.0
 	github.com/go-playground/validator/v10 v10.16.0
+	github.com/gofiber/contrib/jwt v1.0.7
 	github.com/gofiber/fiber/v2 v2.50.0
+	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/google/uuid v1.4.0
 	github.com/gosimple/slug v1.13.1
 	github.com/midtrans/midtrans-go v1.3.7
-	github.com/rs/zerolog v1.31.0
 	github.com/spf13/viper v1.17.0
+	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.15.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
@@ -24,8 +26,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/gofiber/contrib/jwt v1.0.7 // indirect
-	github.com/golang-jwt/jwt/v5 v5.1.0 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
