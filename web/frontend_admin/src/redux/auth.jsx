@@ -132,10 +132,10 @@ export const loginSlice = createSlice({
       .addCase(loginAction.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.accessToken = action.payload.data.access_token;
-        state.refreshToken = action.payload.data.refresh_token;
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
 
-        state.user = decodeToken(action.payload.data.access_token);
+        state.user = decodeToken(action.payload.access_token);
       })
       .addCase(loginAction.rejected, (state, action) => {
         state.loading = false;
