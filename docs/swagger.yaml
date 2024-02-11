@@ -1,0 +1,1340 @@
+basePath: /api/
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  cart.CartCreateRequest:
+    properties:
+      image_product:
+        type: string
+      name:
+        type: string
+      price:
+        type: string
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      user_id:
+        type: integer
+      weight:
+        type: integer
+    type: object
+  cart.DeleteCartRequest:
+    properties:
+      cart_ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  midtransrequest.CreateMidtransRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      gross_amount:
+        type: integer
+      last_name:
+        type: string
+      phone:
+        type: string
+    type: object
+  order.CartItemRequest:
+    properties:
+      name:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  order.CreateOrderRequest:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/order.CartItemRequest'
+        type: array
+      courier:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      shipping_address:
+        $ref: '#/definitions/order.ShippingAddressRequest'
+      shipping_cost:
+        type: integer
+      shipping_method:
+        type: string
+      total_price:
+        type: string
+      total_product:
+        type: string
+    type: object
+  order.ShippingAddressRequest:
+    properties:
+      alamat:
+        type: string
+      kota:
+        type: string
+      negara:
+        type: string
+      provinsi:
+        type: string
+    type: object
+  rajaongkirrequest.OngkosRequest:
+    properties:
+      asal:
+        type: string
+      berat:
+        type: integer
+      kurir:
+        type: string
+      tujuan:
+        type: string
+    type: object
+  response.ErrorMessage:
+    properties:
+      error:
+        type: boolean
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  review.CreateReviewRequest:
+    properties:
+      comment:
+        type: string
+      rating:
+        type: integer
+    type: object
+  user.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: REST API for Ecommerce fiber
+  title: EcommerceFiber
+  version: "1.0"
+paths:
+  /api/cart/delete-many:
+    delete:
+      consumes:
+      - application/json
+      description: Delete multiple carts by their IDs
+      parameters:
+      - description: Delete Cart Request Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/cart.DeleteCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Delete many carts
+      tags:
+      - Cart
+  /api/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: Get dashboard data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get dashboard data
+      tags:
+      - Dashboard
+  /api/slider/{id}:
+    get:
+      description: Get slider by ID
+      parameters:
+      - description: Slider ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get slider by ID
+      tags:
+      - Slider
+  /auth/hello:
+    get:
+      description: Return a greeting message to the user
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Greet the user
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password to get a JWT token
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Login to the application
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refresh Token
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Refresh Token to the application
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create User
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Register to the application
+      tags:
+      - Auth
+  /cart:
+    get:
+      consumes:
+      - application/json
+      description: Get all carts associated with the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      tags:
+      - Cart
+  /cart/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new cart for the authenticated user
+      parameters:
+      - description: Cart Create Request Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/cart.CartCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create cart
+      tags:
+      - Cart
+  /cart/delete/{cart_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a cart by its ID
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cart_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Delete cart
+      tags:
+      - Cart
+  /category:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get all categories
+      tags:
+      - Category
+  /category/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get category by ID
+      tags:
+      - Category
+  /category/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category Image
+        in: formData
+        name: image_category
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create category
+      tags:
+      - Category
+  /category/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Delete category by ID
+      tags:
+      - Category
+  /category/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Get a category by its slug
+      parameters:
+      - description: Category Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get category by slug
+      tags:
+      - Category
+  /category/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category Image
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Update category by ID
+      tags:
+      - Category
+  /midtrans/create-transaction:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction
+      parameters:
+      - description: Request body to create a new transaction
+        in: body
+        name: createMidtransRequest
+        required: true
+        schema:
+          $ref: '#/definitions/midtransrequest.CreateMidtransRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create transaction
+      tags:
+      - Midtrans
+  /order/:
+    get:
+      description: Retrieve all orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get all orders
+      tags:
+      - Order
+  /order/{id}:
+    get:
+      description: Retrieve an order by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get order by ID
+      tags:
+      - Order
+  /order/by-user:
+    get:
+      description: Retrieve orders associated with a specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get orders by user ID
+      tags:
+      - Order
+  /order/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order
+      parameters:
+      - description: Request body to create a new order
+        in: body
+        name: createOrderRequest
+        required: true
+        schema:
+          $ref: '#/definitions/order.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create order
+      tags:
+      - Order
+  /order/hello:
+    get:
+      description: Return a greeting message for orders
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Greet the user for orders
+      tags:
+      - Order
+  /product:
+    get:
+      description: Retrieve all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get all products
+      tags:
+      - Product
+  /product/{id}:
+    get:
+      description: Retrieve a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get product by ID
+      tags:
+      - Product
+  /product/create:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new product
+      parameters:
+      - description: Product Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category ID
+        in: formData
+        name: category
+        required: true
+        type: string
+      - description: Product Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Product Brand
+        in: formData
+        name: brand
+        required: true
+        type: string
+      - description: Product Price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      - description: Product Count In Stock
+        in: formData
+        name: countInStock
+        required: true
+        type: integer
+      - description: Product Weight
+        in: formData
+        name: weight
+        required: true
+        type: integer
+      - description: Product Rating
+        in: formData
+        name: rating
+        required: true
+        type: integer
+      - description: Product Image
+        in: formData
+        name: image_product
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create product
+      tags:
+      - Product
+  /product/delete/{id}:
+    delete:
+      description: Delete an existing product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Delete product
+      tags:
+      - Product
+  /product/hello:
+    get:
+      description: Return a greeting message for products
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Greet the user for products
+      tags:
+      - Product
+  /product/slug/{slug}:
+    get:
+      description: Retrieve a product by its slug
+      parameters:
+      - description: Product Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get product by slug
+      tags:
+      - Product
+  /product/update/{id}:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update an existing product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category ID
+        in: formData
+        name: category
+        required: true
+        type: string
+      - description: Product Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Product Brand
+        in: formData
+        name: brand
+        required: true
+        type: string
+      - description: Product Price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      - description: Product Count In Stock
+        in: formData
+        name: countInStock
+        required: true
+        type: integer
+      - description: Product Weight
+        in: formData
+        name: weight
+        required: true
+        type: integer
+      - description: Product Rating
+        in: formData
+        name: rating
+        required: true
+        type: integer
+      - description: Product Image
+        in: formData
+        name: image_product
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Update product
+      tags:
+      - Product
+  /rajaongkir/city/{id}:
+    get:
+      description: Get list of cities by province ID from RajaOngkir
+      parameters:
+      - description: Province ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get cities by province ID from RajaOngkir
+      tags:
+      - RajaOngkir
+  /rajaongkir/cost:
+    post:
+      consumes:
+      - application/json
+      description: Get shipping cost from RajaOngkir
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/rajaongkirrequest.OngkosRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get shipping cost from RajaOngkir
+      tags:
+      - RajaOngkir
+  /rajaongkir/provinsi:
+    get:
+      description: Get list of provinces from RajaOngkir
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get provinces from RajaOngkir
+      tags:
+      - RajaOngkir
+  /review:
+    get:
+      description: Get all reviews
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get all reviews
+      tags:
+      - Review
+  /review/{id}:
+    get:
+      description: Get review by ID
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get review by ID
+      tags:
+      - Review
+  /review/create/{product_id}:
+    post:
+      consumes:
+      - application/json
+      description: Create review
+      parameters:
+      - description: JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      - description: Review data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/review.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Create review
+      tags:
+      - Review
+  /slider:
+    get:
+      description: Get all sliders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Get all sliders
+      tags:
+      - Slider
+  /slider/create:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new slider
+      parameters:
+      - description: Slider Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Slider Image File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Create a new slider
+      tags:
+      - Slider
+  /slider/delete/{id}:
+    delete:
+      description: Delete slider by ID
+      parameters:
+      - description: Slider ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Delete slider by ID
+      tags:
+      - Slider
+  /slider/update/{id}:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update slider by ID
+      parameters:
+      - description: Slider ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Slider Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Slider Image File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Update slider by ID
+      tags:
+      - Slider
+  /user:
+    get:
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - User
+  /user/{id}:
+    get:
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - User
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - User
+  /user/delete/{id}:
+    delete:
+      description: Delete user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Delete user by ID
+      tags:
+      - User
+  /user/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - BearerAuth: []
+      summary: Update user by ID
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: Header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

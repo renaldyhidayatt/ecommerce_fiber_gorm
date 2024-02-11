@@ -18,6 +18,18 @@ import (
 	"go.uber.org/zap"
 )
 
+// @title EcommerceFiber
+// @version 1.0
+// @description REST API for Ecommerce fiber
+
+// @host localhost:8000
+// @BasePath /api/
+
+// @securityDefinitions.apikey BearerAuth
+// @in Header
+// @name Authorization
+
+// Run initializes whole application.
 func Run() {
 	log, err := logger.NewLogger()
 
