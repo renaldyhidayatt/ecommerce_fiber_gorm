@@ -75,9 +75,23 @@ func RunServer() {
 
 	handleAuth := gapi.NewAuthHandleGrpc(service.Auth)
 	handleUser := gapi.NewUserHandleGrpc(service.User)
+	handleCategory := gapi.NewCategoryHandleGrpc(service.Category)
+	handleProduct := gapi.NewProductHandleGrpc(service.Product)
+	handleOrder := gapi.NewOrderHandleGrpc(service.Order)
+	handleRajaongkir := gapi.NewRajaOngirHandleGrpc(service.RajaOngkir)
+	handleMidtrans := gapi.NewMidtransHandleGrpc(service.Midtrans)
+	handleReview := gapi.NewReviewHandleGrpc(service.Review)
+	handleSlider := gapi.NewSliderHandleGrpc(service.Slider)
 
 	pb.RegisterAuthServiceServer(grpcServer, handleAuth)
 	pb.RegisterUserServiceServer(grpcServer, handleUser)
+	pb.RegisterCategoryServiceServer(grpcServer, handleCategory)
+	pb.RegisterProductServiceServer(grpcServer, handleProduct)
+	pb.RegisterOrderServiceServer(grpcServer, handleOrder)
+	pb.RegisterRajaOngkirServiceServer(grpcServer, handleRajaongkir)
+	pb.RegisterMidtransServiceServer(grpcServer, handleMidtrans)
+	pb.RegisterReviewServiceServer(grpcServer, handleReview)
+	pb.RegisterSliderServiceServer(grpcServer, handleSlider)
 
 	logger.Info(fmt.Sprintf("Server running on port %d", *port))
 
