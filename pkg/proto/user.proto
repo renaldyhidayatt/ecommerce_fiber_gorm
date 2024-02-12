@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+message User{
+    int64 id = 1;
+    string name = 2;
+    string email = 3;
+    bool is_staff = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
+message UserResponse{
+    User user = 1;
+}
+
+message UsersResponse{
+    repeated User users = 1;
+}
+
+
+message CreateUserRequest{
+    string name = 1;
+    string email = 2;
+    string password = 3;
+    string confirm_password = 4;
+}
+
+message UpdateUserRequest{
+    int64 id = 1;
+    string name = 2;
+    string email = 3;
+    string password = 4;
+    string confirm_password = 5;
+}
+
+message UserRequest{
+    int64 id = 1;
+}
+
+message DeleteUserResponse{
+    bool success = 1;
+}
+
+service UserService{
+    rpc GetUsers(google.protobuf.Empty) returns (UsersResponse);
+    rpc GetUser(UserRequest) returns (UserResponse);
+    rpc CreateUser(CreateUserRequest) returns (UserResponse);
+    rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+    rpc DeleteUser(UserRequest) returns (DeleteUserResponse);
+}

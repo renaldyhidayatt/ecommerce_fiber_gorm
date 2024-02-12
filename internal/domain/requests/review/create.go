@@ -3,8 +3,10 @@ package review
 import "github.com/go-playground/validator/v10"
 
 type CreateReviewRequest struct {
-	Rating  int    `json:"rating"`
-	Comment string `json:"comment"`
+	UserID    int    `json:"user_id"`
+	ProductID int    `json:"product_id"`
+	Rating    int    `json:"rating"`
+	Comment   string `json:"comment"`
 }
 
 func (l *CreateReviewRequest) Validate() error {

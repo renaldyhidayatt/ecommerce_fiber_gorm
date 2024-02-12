@@ -63,8 +63,8 @@ func (r *sliderRepository) CreateSlider(sliderRequest *slider.CreateSliderReques
 	return &mySlider, nil
 }
 
-func (r *sliderRepository) UpdateSliderByID(sliderID int, updatedSlider *slider.UpdateSliderRequest) (*models.Slider, error) {
-	mySlider, err := r.GetSliderByID(sliderID)
+func (r *sliderRepository) UpdateSliderByID(updatedSlider *slider.UpdateSliderRequest) (*models.Slider, error) {
+	mySlider, err := r.GetSliderByID(updatedSlider.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+message QueryProvinsi {
+    string id = 1;
+}
+
+
+message StatusProvinsi {
+    int32 code = 1;
+    string description = 2;
+}
+
+message ResultsProvinsi {
+    string province_id = 1;
+    string province = 2;
+}
+
+message RajaOngkirResponseProvinsi {
+    message Rajaongkir {
+        repeated QueryProvinsi query = 1;
+        StatusProvinsi status = 2;
+        repeated ResultsProvinsi results = 3;
+    }
+    Rajaongkir rajaongkir = 1;
+}
+
+message QueryCity {
+    string province = 1;
+    string id = 2;
+}
+
+
+
+message StatusCity {
+    int32 code = 1;
+    string description = 2;
+}
+
+
+message ResultsCity {
+    string city_id = 1;
+    string province_id = 2;
+    string province = 3;
+    string type = 4;
+    string city_name = 5;
+    string postal_code = 6;
+}
+
+
+message RajaOngkirCityResponse {
+    message Rajaongkir {
+        QueryCity query = 1;
+        StatusCity status = 2;
+        repeated ResultsCity results = 3;
+    }
+    Rajaongkir rajaongkir = 1;
+}
+
+
+message Query {
+    string origin = 1;
+    string destination = 2;
+    int32 weight = 3;
+    string courier = 4;
+}
+
+
+message Status {
+    int32 code = 1;
+    string description = 2;
+}
+
+
+message CityDetails {
+    string city_id = 1;
+    string province_id = 2;
+    string province = 3;
+    string type = 4;
+    string city_name = 5;
+    string postal_code = 6;
+}
+
+message CostDetail {
+    int32 value = 1;
+    string etd = 2;
+    string note = 3;
+}
+
+
+message Cost {
+    string service = 1;
+    string description = 2;
+    repeated CostDetail cost_details = 3;
+}
+
+message CourierResult {
+    string code = 1;
+    string name = 2;
+    repeated Cost costs = 3;
+}
+
+
+
+message RajaOngkirOngkosResponse {
+    message RajaOngkir {
+        Query query = 1;
+        Status status = 2;
+        CityDetails origin_details = 3;
+        CityDetails destination_details = 4;
+        repeated CourierResult results = 5;
+    }
+    RajaOngkir rajaongkir = 1;
+}
+
+message CityRequest{
+    int32 id = 1;
+}
+
+message OngkosRequest{
+    string asal = 1;
+    string tujuan = 2;
+    int32 berat = 3;
+    string kurir = 4;
+}
+
+service RajaOngkirService{
+    rpc GetProvinsi(google.protobuf.Empty) returns (RajaOngkirResponseProvinsi);
+    rpc GetCities(CityRequest) returns (RajaOngkirCityResponse);
+    rpc GetCost(OngkosRequest) returns (RajaOngkirOngkosResponse);
+}

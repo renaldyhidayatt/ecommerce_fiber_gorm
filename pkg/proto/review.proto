@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+import "user.proto";
+
+
+message Review{
+    int32 id = 1;
+    string name = 2;
+    string comment = 3;
+    int32 rating = 4;
+    User user = 6;
+    string sentiment = 7;
+    int32 product_id = 8;
+}
+
+message ReviewResponse{
+    Review review = 1;
+}
+
+message ReviewsResponse{
+    repeated Review reviews = 1;
+}
+
+
+message CreateReviewRequest{
+    string name = 1;
+    string comment = 2;
+    int32 rating = 3;
+    int32 user_id = 4;
+    int32 product_id = 5;
+}
+
+message ReviewRequest{
+    int32 id = 1;
+}
+
+service ReviewService{
+    rpc GetReviews(google.protobuf.Empty) returns (ReviewsResponse);
+    rpc CreateReview(CreateReviewRequest) returns (ReviewResponse);
+    rpc GetReview(ReviewRequest) returns (ReviewResponse);
+}

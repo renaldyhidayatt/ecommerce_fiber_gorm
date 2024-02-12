@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+
+message OrderRelationResponse {
+    int64 id = 1;
+    int32 user_id = 2;
+    string name = 3;
+    string phone = 4;
+    string email = 5;
+    string courier = 6;
+    string shipping_method = 7;
+    int32 shipping_cost = 8;
+    string total_product = 9;
+    int32 total_price = 10;
+    string transaction_id = 11;
+    repeated OrderItemResponse order_items = 12;
+    ShippingAddressResponse shipping_address = 13;
+}
+
+message OrderResponse {
+    int64 id = 1;
+    int32 user_id = 2;
+    string user_name = 3;
+    string user_email = 4;
+    string name = 5;
+    string phone = 6;
+    string email = 7;
+    string courier = 8;
+    string shipping_method = 9;
+    int32 shipping_cost = 10;
+    string total_product = 11;
+    int32 total_price = 12;
+    string transaction_id = 13;
+}
+
+message OrderResponses {
+    repeated OrderResponse orders = 1;
+}
+
+message OrderItemResponse {
+    int64 id = 1;
+    string name = 2;
+    int32 quantity = 3;
+    int32 price = 4;
+}
+
+message ShippingAddressResponse {
+    int64 id = 1;
+    string alamat = 2;
+    string provinsi = 3;
+    string negara = 4;
+    string kota = 5;
+}
+
+message CartItemRequest {
+    string name = 1;
+    int32 quantity = 2;
+    int32 price = 3;
+}
+
+
+message ShippingAddressRequest {
+    string alamat = 1;
+    string provinsi = 2;
+    string kota = 3;
+    string negara = 4;
+}
+
+message OrderRequest {
+    int64 id = 1;
+}
+
+message CreateOrderRequest {
+    int64 user_id = 1;
+    string name = 2;
+    string phone = 3;
+    string courier = 4;
+    ShippingAddressRequest shipping_address = 5;
+    repeated CartItemRequest cart_items = 6;
+    string shipping_method = 7;
+    int32 shipping_cost = 8;
+    string total_product = 9;
+    string total_price = 10;
+}
+
+service OrderService {
+    rpc GetOrders(google.protobuf.Empty) returns (OrderResponses);
+    rpc GetOrder(OrderRequest) returns (OrderRelationResponse);
+    rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
+    rpc GetOrderUsers(OrderRequest) returns (OrderResponses);
+}

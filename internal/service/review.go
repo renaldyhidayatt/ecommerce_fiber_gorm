@@ -2,31 +2,37 @@ package service
 
 import (
 	"ecommerce_fiber/internal/domain/requests/review"
-	"ecommerce_fiber/internal/models"
+	reviewres "ecommerce_fiber/internal/domain/response/review"
+	"ecommerce_fiber/internal/mapper"
 	"ecommerce_fiber/internal/repository"
 )
 
 type reviewService struct {
 	reviewRepository repository.ReviewRepository
+	mapper           mapper.ReviewMapping
 }
 
-func NewReviewService(reviewRepository repository.ReviewRepository) *reviewService {
+func NewReviewService(reviewRepository repository.ReviewRepository, mapper mapper.ReviewMapping) *reviewService {
 	return &reviewService{
 		reviewRepository: reviewRepository,
+		mapper:           mapper,
 	}
 }
 
-func (s *reviewService) GetAllReviews() (*[]models.Review, error) {
+func (s *reviewService) GetAllReviews() (*[]reviewres.ReviewResponse, error) {
 
 	res, err := s.reviewRepository.GetAll()
 
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	mapper := s.mapper.ToReviewResponses(res)
+
+	return mapper, nil
 }
 
-func (s *reviewService) GetReviewByID(reviewID int) (*models.Review, error) {
+func (s *reviewService) GetReviewByID(reviewID int) (*reviewres.ReviewResponse, error) {
 
 	res, err := s.reviewRepository.GetByID(reviewID)
 
@@ -34,17 +40,21 @@ func (s *reviewService) GetReviewByID(reviewID int) (*models.Review, error) {
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToReviewResponse(res)
+
+	return mapper, nil
 
 }
 
-func (s *reviewService) CreateReview(productID int, user_id int, request *review.CreateReviewRequest) (*models.Review, error) {
+func (s *reviewService) CreateReview(request *review.CreateReviewRequest) (*reviewres.ReviewResponse, error) {
 
-	res, err := s.reviewRepository.CreateReview(*request, user_id, productID)
+	res, err := s.reviewRepository.CreateReview(*request)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return res, nil
+	mapper := s.mapper.ToReviewResponse(res)
+
+	return mapper, nil
 }

@@ -17,7 +17,10 @@ export const fetchProvinces = createAsyncThunk(
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      return response.data.rajaongkir.results;
+
+      console.log('Result Provinsi: ', response.data.data);
+
+      return response.data.data.rajaongkir.results;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -41,7 +44,9 @@ export const fetchCities = createAsyncThunk(
         },
       });
 
-      return response.data.rajaongkir.results;
+      console.log('Result Cities: ', response.data.data);
+
+      return response.data.data.rajaongkir.results;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -73,7 +78,10 @@ export const calculateShippingCost = createAsyncThunk(
           },
         }
       );
-      return response.data.rajaongkir.results;
+
+      console.log('Result Calculate: ', response.data.data);
+
+      return response.data.data.rajaongkir.results;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -100,10 +108,15 @@ const rajaOngkirSlice = createSlice({
       })
       .addCase(fetchProvinces.fulfilled, (state, action) => {
         state.loading = false;
+
+        console.log('Payload: ', action.payload);
+
         state.provinces = action.payload;
       })
       .addCase(fetchProvinces.rejected, (state, action) => {
         state.loading = false;
+
+        console.log('Error: ', action.error.message);
         state.error = action.error.message;
       })
       .addCase(fetchCities.pending, (state) => {
@@ -128,6 +141,9 @@ const rajaOngkirSlice = createSlice({
       })
       .addCase(calculateShippingCost.rejected, (state, action) => {
         state.loading = false;
+
+        console.log('Error Calculate:', action.error.message);
+
         state.error = action.error.message;
       });
   },

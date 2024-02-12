@@ -26,8 +26,8 @@ func NewProductService(repository repository.ProductRepository, logger logger.Lo
 	}
 }
 
-func (s *productService) GetAllProduct() ([]*pro.ProductResponse, error) {
-	res, err := s.repository.GetAllProducts()
+func (s *productService) GetProducts() ([]*pro.ProductResponse, error) {
+	res, err := s.repository.GetProducts()
 
 	if err != nil {
 		s.logger.Error("Error while getting all products", zap.Error(err))
@@ -65,8 +65,8 @@ func (s *productService) CreateProduct(request *product.CreateProductRequest) (*
 
 }
 
-func (s *productService) GetById(productID int) (*pro.ProductResponse, error) {
-	res, err := s.repository.GetProductByID(productID)
+func (s *productService) GetProduct(productID int) (*pro.ProductResponse, error) {
+	res, err := s.repository.GetProduct(productID)
 
 	if err != nil {
 		s.logger.Error("Error while getting product by id", zap.Error(err))
@@ -78,8 +78,8 @@ func (s *productService) GetById(productID int) (*pro.ProductResponse, error) {
 	return mapper, nil
 }
 
-func (s *productService) GetBySlug(slug string) (*pro.ProductResponse, error) {
-	res, err := s.repository.GetProductBySlug(slug)
+func (s *productService) GetProductSlug(slug string) (*pro.ProductResponse, error) {
+	res, err := s.repository.GetProductSlug(slug)
 
 	if err != nil {
 		s.logger.Error("Error while getting product by slug", zap.Error(err))
@@ -91,7 +91,7 @@ func (s *productService) GetBySlug(slug string) (*pro.ProductResponse, error) {
 	return mapper, nil
 }
 
-func (s *productService) UpdateProduct(id int, request *product.UpdateProductRequest) (*pro.ProductResponse, error) {
+func (s *productService) UpdateProduct(request *product.UpdateProductRequest) (*pro.ProductResponse, error) {
 
 	var schema product.UpdateProductRequest
 
@@ -104,7 +104,7 @@ func (s *productService) UpdateProduct(id int, request *product.UpdateProductReq
 	schema.Rating = request.Rating
 	schema.FilePath = request.FilePath
 
-	res, err := s.repository.UpdateProduct(id, request)
+	res, err := s.repository.UpdateProduct(request)
 	if err != nil {
 		s.logger.Error("Error while updating product", zap.Error(err))
 		return nil, err
@@ -136,7 +136,7 @@ func (s *productService) UpdateQuantity(cart []*cart.CartCreateRequest) (bool, e
 		productID := item.ProductID
 		quantity := item.Quantity
 
-		product, err := s.GetById(productID)
+		product, err := s.GetProduct(productID)
 
 		if err != nil {
 			s.logger.Error("Error while getting product by id", zap.Error(err))

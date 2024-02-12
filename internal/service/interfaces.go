@@ -16,6 +16,9 @@ import (
 	"ecommerce_fiber/internal/domain/response/dashboard"
 	or "ecommerce_fiber/internal/domain/response/order"
 	pro "ecommerce_fiber/internal/domain/response/product"
+	rajaongkirresponse "ecommerce_fiber/internal/domain/response/rajaongkir"
+	reviewres "ecommerce_fiber/internal/domain/response/review"
+	userResponse "ecommerce_fiber/internal/domain/response/user"
 	"ecommerce_fiber/internal/models"
 
 	"github.com/midtrans/midtrans-go/snap"
@@ -26,17 +29,17 @@ type DashboardService interface {
 }
 
 type AuthService interface {
-	Register(input *auth.RegisterRequest) (*models.User, error)
+	Register(input *auth.RegisterRequest) (*userResponse.UserResponse, error)
 	Login(input *auth.LoginRequest) (*response.Token, error)
 	RefreshToken(req auth.RefreshTokenRequest) (*response.Token, error)
 }
 
 type UserService interface {
-	GetUserAll() (*[]models.User, error)
-	CreateUser(request *auth.RegisterRequest) (*models.User, error)
-	GetUserById(id int) (*models.User, error)
-	UpdateUserById(id int, request *user.UpdateUserRequest) (*models.User, error)
-	DeleteUserById(id int) (*models.User, error)
+	GetUsers() (*[]userResponse.UserResponse, error)
+	CreateUser(request *auth.RegisterRequest) (*userResponse.UserResponse, error)
+	GetUser(id int) (*userResponse.UserResponse, error)
+	UpdateUser(request *user.UpdateUserRequest) (*userResponse.UserResponse, error)
+	DeleteUser(id int) (*userResponse.UserResponse, error)
 }
 
 type CartService interface {
@@ -47,12 +50,12 @@ type CartService interface {
 }
 
 type CategoryService interface {
-	GetAll() ([]*catresponse.CategoryResponse, error)
-	GetByID(categoryID int) (*catresponse.CategoryResponse, error)
-	GetBySlug(slug string) (*catresponse.CategoryResponse, error)
-	Create(request *category.CreateCategoryRequest) (*catresponse.CategoryResponse, error)
-	UpdateByID(id int, updateCategory *category.UpdateCategoryRequest) (*catresponse.CategoryResponse, error)
-	DeleteByID(categoryID int) (*catresponse.CategoryResponse, error)
+	GetCategories() ([]*catresponse.CategoryResponse, error)
+	GetCategory(categoryID int) (*catresponse.CategoryResponse, error)
+	GetCategorySlug(slug string) (*catresponse.CategoryResponse, error)
+	CreateCategory(request *category.CreateCategoryRequest) (*catresponse.CategoryResponse, error)
+	UpdateCategory(updateCategory *category.UpdateCategoryRequest) (*catresponse.CategoryResponse, error)
+	DeleteCategory(categoryID int) (*catresponse.CategoryResponse, error)
 }
 
 type MidtransService interface {
@@ -60,37 +63,37 @@ type MidtransService interface {
 }
 
 type ProductService interface {
-	GetAllProduct() ([]*pro.ProductResponse, error)
+	GetProducts() ([]*pro.ProductResponse, error)
 	CreateProduct(request *product.CreateProductRequest) (*pro.ProductResponse, error)
-	GetById(productID int) (*pro.ProductResponse, error)
-	GetBySlug(slug string) (*pro.ProductResponse, error)
-	UpdateProduct(id int, request *product.UpdateProductRequest) (*pro.ProductResponse, error)
+	GetProduct(productID int) (*pro.ProductResponse, error)
+	GetProductSlug(slug string) (*pro.ProductResponse, error)
+	UpdateProduct(request *product.UpdateProductRequest) (*pro.ProductResponse, error)
 	DeleteProduct(productID int) (*pro.ProductResponse, error)
 }
 
 type OrderService interface {
 	GetAll() (*[]or.OrderResponses, error)
 	GetByID(orderID int) (*or.OrderResponse, error)
-	CreateOrder(user_id int, request *order.CreateOrderRequest) (*models.Order, error)
+	CreateOrder(request *order.CreateOrderRequest) (*models.Order, error)
 	OrdersByUser(userID int) (*[]models.Order, error)
 }
 
 type RajaOngkirService interface {
-	GetProvinsi() (map[string]interface{}, error)
-	GetCity(idProv int) (map[string]interface{}, error)
-	GetCost(request rajaongkirrequest.OngkosRequest) (map[string]interface{}, error)
+	GetProvinsi() (*rajaongkirresponse.RajaOngkirResponseProvinsi, error)
+	GetCity(idProv int) (*rajaongkirresponse.RajaOngkirCityResponse, error)
+	GetCost(request rajaongkirrequest.OngkosRequest) (*rajaongkirresponse.RajaOngkirOngkosResponse, error)
 }
 
 type ReviewService interface {
-	GetAllReviews() (*[]models.Review, error)
-	GetReviewByID(reviewID int) (*models.Review, error)
-	CreateReview(productID int, user_id int, request *review.CreateReviewRequest) (*models.Review, error)
+	GetAllReviews() (*[]reviewres.ReviewResponse, error)
+	GetReviewByID(reviewID int) (*reviewres.ReviewResponse, error)
+	CreateReview(request *review.CreateReviewRequest) (*reviewres.ReviewResponse, error)
 }
 
 type SliderService interface {
 	GetAllSliders() (*[]models.Slider, error)
 	GetSliderByID(sliderID int) (*models.Slider, error)
 	CreateSlider(request slider.CreateSliderRequest) (*models.Slider, error)
-	UpdateSliderByID(sliderID int, request slider.UpdateSliderRequest) (*models.Slider, error)
+	UpdateSliderByID(request slider.UpdateSliderRequest) (*models.Slider, error)
 	DeleteSliderByID(sliderID int) (*models.Slider, error)
 }

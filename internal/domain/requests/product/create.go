@@ -10,7 +10,7 @@ type CreateProductRequest struct {
 	Brand        string `json:"brand"`
 	CountInStock int    `json:"count_in_stock"`
 	Weight       int    `json:"weight"`
-	Rating       *int   `json:"rating,omitempty"`
+	Rating       int    `json:"rating,omitempty"`
 	FilePath     string `json:"file"`
 }
 

@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+
+message Product{
+    int32 id = 1;
+    string name = 2;
+    int32 category_id = 3;
+    string description = 4;
+    int32 price = 5;
+    int32 count_in_stock = 6;
+    string brand = 7;
+    int32 weight = 8;
+    int32 rating = 9;
+    string slug = 10;
+    string image_path = 11;
+    string created_at = 12;
+    string updated_at = 13;
+}
+
+message CreateProductRequest {
+    string name = 1;
+    string category_id = 2;
+    string description = 3;
+    int32 price = 4;
+    string brand = 5;
+    int32 count_in_stock = 6;
+    int32 weight = 7;
+    int32 rating = 8;
+    string file_path = 9;
+}
+
+message UpdateProductRequest{
+    int32 id = 1;
+    string name = 2;
+    string category_id = 3;
+    string description = 4;
+    int32 price = 5;
+    string brand = 6;
+    int32 count_in_stock = 7;
+    int32 weight = 8;
+    int32 rating = 9;
+    string file_path = 10;
+}
+
+message ProductResponse{
+    Product product = 1;
+}
+
+message ProductsResponse{
+    repeated Product products = 1;
+}
+
+
+
+message ProductRequest{
+    int64 id = 1;
+}
+
+message ProductSlugRequest{
+    string slug = 1;
+}
+
+message DeleteProductResponse{
+    bool success = 1;
+}
+
+service ProductService{
+    rpc GetProducts(google.protobuf.Empty) returns (ProductsResponse);
+    rpc GetProduct(ProductRequest) returns (ProductResponse);
+    rpc GetProductSlug(ProductSlugRequest) returns (ProductResponse);
+    rpc CreateProduct(CreateProductRequest) returns (ProductResponse);
+    rpc UpdateProduct(UpdateProductRequest) returns (ProductResponse);
+    rpc DeleteProduct(ProductRequest) returns (DeleteProductResponse);
+}

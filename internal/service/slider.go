@@ -60,13 +60,14 @@ func (s *sliderService) CreateSlider(request slider.CreateSliderRequest) (*model
 	return res, nil
 }
 
-func (s *sliderService) UpdateSliderByID(sliderID int, request slider.UpdateSliderRequest) (*models.Slider, error) {
+func (s *sliderService) UpdateSliderByID(request slider.UpdateSliderRequest) (*models.Slider, error) {
 	schema := &slider.UpdateSliderRequest{
+		ID:       request.ID,
 		Nama:     request.Nama,
 		FilePath: request.FilePath,
 	}
 
-	res, err := s.repository.UpdateSliderByID(sliderID, schema)
+	res, err := s.repository.UpdateSliderByID(schema)
 
 	if err != nil {
 		s.logger.Error("Error while updating slider:", zap.Error(err))

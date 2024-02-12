@@ -3,7 +3,8 @@ package service
 import (
 	"ecommerce_fiber/internal/domain/requests/auth"
 	"ecommerce_fiber/internal/domain/response"
-	"ecommerce_fiber/internal/models"
+	userResponse "ecommerce_fiber/internal/domain/response/user"
+	"ecommerce_fiber/internal/mapper"
 	"ecommerce_fiber/internal/repository"
 	customAuth "ecommerce_fiber/pkg/auth"
 	"ecommerce_fiber/pkg/hashing"
@@ -14,22 +15,24 @@ import (
 )
 
 type authService struct {
-	user  repository.UserRepository
-	hash  hashing.Hashing
-	log   logger.Logger
-	token customAuth.TokenManager
+	user    repository.UserRepository
+	hash    hashing.Hashing
+	mapping mapper.UserMapping
+	log     logger.Logger
+	token   customAuth.TokenManager
 }
 
-func NewAuthService(user repository.UserRepository, hash hashing.Hashing, log logger.Logger, token customAuth.TokenManager) *authService {
+func NewAuthService(user repository.UserRepository, hash hashing.Hashing, log logger.Logger, token customAuth.TokenManager, mapping mapper.UserMapping) *authService {
 	return &authService{
-		user:  user,
-		hash:  hash,
-		log:   log,
-		token: token,
+		user:    user,
+		hash:    hash,
+		log:     log,
+		token:   token,
+		mapping: mapping,
 	}
 }
 
-func (s *authService) Register(input *auth.RegisterRequest) (*models.User, error) {
+func (s *authService) Register(input *auth.RegisterRequest) (*userResponse.UserResponse, error) {
 	hashing, err := s.hash.HashPassword(input.Password)
 
 	if err != nil {
@@ -44,7 +47,14 @@ func (s *authService) Register(input *auth.RegisterRequest) (*models.User, error
 		return nil, err
 	}
 
-	return user, nil
+	return &userResponse.UserResponse{
+		ID:         int(user.ID),
+		Name:       user.Name,
+		Email:      user.Email,
+		IsStaff:    user.IsStaff,
+		Created_at: user.CreatedAt.String(),
+		Updated_at: user.UpdatedAt.String(),
+	}, nil
 }
 
 func (s *authService) Login(input *auth.LoginRequest) (*response.Token, error) {
@@ -96,7 +106,7 @@ func (s *authService) RefreshToken(req auth.RefreshTokenRequest) (*response.Toke
 		return nil, errors.New("invalid refresh token")
 	}
 
-	email, err := s.user.GetUserById(idInt)
+	email, err := s.user.GetUser(idInt)
 
 	if err != nil {
 		return nil, errors.New("invalid refresh token")

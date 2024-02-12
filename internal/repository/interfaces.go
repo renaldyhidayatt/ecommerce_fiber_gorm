@@ -20,17 +20,17 @@ type CartRepository interface {
 }
 
 type CategoryRepository interface {
-	GetAll() (*[]models.Category, error)
-	Create(request *category.CreateCategoryRequest) (*models.Category, error)
-	GetByID(categoryID int) (*models.Category, error)
-	GetBySlug(slug string) (*models.Category, error)
-	UpdateByID(id int, updatedCategory *category.UpdateCategoryRequest) (*models.Category, error)
-	DeleteByID(categoryID int) (*models.Category, error)
+	GetCategories() (*[]models.Category, error)
+	CreateCategory(request *category.CreateCategoryRequest) (*models.Category, error)
+	GetCategory(categoryID int) (*models.Category, error)
+	GetCategorySlug(slug string) (*models.Category, error)
+	UpdateCategory(updatedCategory *category.UpdateCategoryRequest) (*models.Category, error)
+	DeleteCategory(categoryID int) (*models.Category, error)
 }
 
 type OrderRepository interface {
 	GetAll() (*[]models.Order, error)
-	CreateOrder(user_id int, request *order.CreateOrderRequest) (*models.Order, error)
+	CreateOrder(request *order.CreateOrderRequest) (*models.Order, error)
 	GetByUser(userID int) (*[]models.Order, error)
 	GetByID(orderID int) (*models.Order, error)
 	CountOrder() (int, error)
@@ -39,12 +39,12 @@ type OrderRepository interface {
 }
 
 type ProductRepository interface {
-	GetAllProducts() (*[]models.Product, error)
-	GetProductBySlug(slug string) (*models.Product, error)
+	GetProducts() (*[]models.Product, error)
+	GetProductSlug(slug string) (*models.Product, error)
+	GetProduct(productID int) (*models.Product, error)
 	CreateProduct(request *product.CreateProductRequest) (*models.Product, error)
-	GetProductByID(productID int) (*models.Product, error)
 	MyUpdateQuantity(productID int, quantity int) (bool, error)
-	UpdateProduct(productID int, request *product.UpdateProductRequest) (*models.Product, error)
+	UpdateProduct(request *product.UpdateProductRequest) (*models.Product, error)
 	DeleteProduct(productID int) (*models.Product, error)
 	CountProduct() (int, error)
 }
@@ -52,22 +52,22 @@ type ProductRepository interface {
 type ReviewRepository interface {
 	GetAll() (*[]models.Review, error)
 	GetByID(reviewID int) (*models.Review, error)
-	CreateReview(request review.CreateReviewRequest, userID int, productID int) (*models.Review, error)
+	CreateReview(request review.CreateReviewRequest) (*models.Review, error)
 }
 
 type SliderRepository interface {
 	GetAllSliders() (*[]models.Slider, error)
 	GetSliderByID(sliderID int) (*models.Slider, error)
 	CreateSlider(sliderRequest *slider.CreateSliderRequest) (*models.Slider, error)
-	UpdateSliderByID(sliderID int, updatedSlider *slider.UpdateSliderRequest) (*models.Slider, error)
+	UpdateSliderByID(updatedSlider *slider.UpdateSliderRequest) (*models.Slider, error)
 	DeleteSliderByID(sliderID int) (*models.Slider, error)
 }
 type UserRepository interface {
 	CreateUser(request *auth.RegisterRequest) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
-	GetUserAll() (*[]models.User, error)
-	GetUserById(id int) (*models.User, error)
-	UpdateUserById(id int, updatedUser *user.UpdateUserRequest) (*models.User, error)
-	DeleteUserById(id int) (*models.User, error)
+	GetUsers() (*[]models.User, error)
+	GetUser(id int) (*models.User, error)
+	UpdateUser(updatedUser *user.UpdateUserRequest) (*models.User, error)
+	DeleteUser(id int) (*models.User, error)
 	CountUser() (int, error)
 }

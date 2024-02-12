@@ -57,7 +57,7 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) GetUserAll() (*[]models.User, error) {
+func (r *userRepository) GetUsers() (*[]models.User, error) {
 	var user []models.User
 
 	db := r.db.Model(user)
@@ -71,7 +71,7 @@ func (r *userRepository) GetUserAll() (*[]models.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) GetUserById(id int) (*models.User, error) {
+func (r *userRepository) GetUser(id int) (*models.User, error) {
 
 	var user models.User
 
@@ -86,44 +86,48 @@ func (r *userRepository) GetUserById(id int) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) UpdateUserById(id int, updatedUser *user.UpdateUserRequest) (*models.User, error) {
+func (r *userRepository) UpdateUser(updatedUser *user.UpdateUserRequest) (*models.User, error) {
 	var user models.User
 
 	db := r.db.Model(user)
 
-	res, err := r.GetUserById(id)
+	checkUser := db.Debug().Where("id = ?", updatedUser.ID).First(&user)
 
-	if err != nil {
-		return nil, err
+	if checkUser.RowsAffected < 1 {
+		return nil, errors.New("error not found user")
 	}
 
-	res.Name = updatedUser.Name
-	res.Email = updatedUser.Email
-	res.Password = updatedUser.Password
+	user.Name = updatedUser.Name
+	user.Email = updatedUser.Email
+	user.Password = updatedUser.Password
 
-	if err := db.Save(&res).Error; err != nil {
-		return nil, errors.New("error updating user: " + err.Error())
+	updateUser := db.Debug().Updates(&user)
+
+	if updateUser.RowsAffected < 1 {
+		return nil, errors.New("error Failed update")
 	}
 
-	return res, nil
+	return &user, nil
 }
 
-func (r *userRepository) DeleteUserById(id int) (*models.User, error) {
+func (r *userRepository) DeleteUser(id int) (*models.User, error) {
 	var user models.User
 
 	db := r.db.Model(user)
 
-	res, err := r.GetUserById(id)
+	checkUser := db.Debug().Where("id = ?", id).First(&user)
 
-	if err != nil {
-		return nil, err
+	if checkUser.RowsAffected < 1 {
+		return &user, errors.New("error not found user")
 	}
 
-	if err := db.Delete(&res).Error; err != nil {
-		return nil, errors.New("error delete user: " + err.Error())
+	deleteUser := db.Debug().Delete(&user)
+
+	if deleteUser.RowsAffected < 1 {
+		return &user, errors.New("failed delete user")
 	}
 
-	return res, nil
+	return &user, nil
 
 }
 

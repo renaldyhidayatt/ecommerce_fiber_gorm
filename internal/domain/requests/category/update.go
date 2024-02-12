@@ -3,6 +3,7 @@ package category
 import "github.com/go-playground/validator/v10"
 
 type UpdateCategoryRequest struct {
+	ID       int    `json:"id" validate:"required"`
 	Name     string `json:"name"`
 	FilePath string `json:"file_path"`
 }

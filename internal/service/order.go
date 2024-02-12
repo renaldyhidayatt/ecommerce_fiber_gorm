@@ -38,8 +38,8 @@ func (s *orderService) GetAll() (*[]or.OrderResponses, error) {
 	return &mapper, nil
 }
 
-func (s *orderService) CreateOrder(user_id int, request *order.CreateOrderRequest) (*models.Order, error) {
-	res, err := s.repository.CreateOrder(user_id, request)
+func (s *orderService) CreateOrder(request *order.CreateOrderRequest) (*models.Order, error) {
+	res, err := s.repository.CreateOrder(request)
 
 	if err != nil {
 		s.logger.Error("Error while creating order", zap.Error(err))

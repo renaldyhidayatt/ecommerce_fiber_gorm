@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+
+message Category{
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string slug = 4;
+    string image_path = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
+
+message CategoryResponse{
+    Category category = 1;
+}
+
+message CategoriesResponse {
+    repeated Category categories = 1;
+}
+
+message CreateCategoryRequest{
+    string name = 1;
+    string file_path = 2;
+}
+
+message UpdateCategoryRequest{
+    int64 id = 1;
+    string name = 2;
+    string file_path = 3;
+}
+
+message CategoryRequest{
+    int64 id = 1;
+}
+
+message CategorySlugRequest{
+    string slug = 1;
+}
+
+message DeleteCategoryResponse{
+    bool success = 1;
+}
+
+service CategoryService{
+    rpc GetCategories(google.protobuf.Empty) returns (CategoriesResponse);
+    rpc GetCategory(CategoryRequest) returns (CategoryResponse);
+    rpc GetCategorySlug(CategorySlugRequest) returns (CategoryResponse);
+    rpc CreateCategory(CreateCategoryRequest) returns (CategoryResponse);
+    rpc UpdateCategory(UpdateCategoryRequest) returns (CategoryResponse);
+    rpc DeleteCategory(CategoryRequest) returns (DeleteCategoryResponse);
+}

@@ -21,10 +21,10 @@ func (r *reviewRepository) GetAll() (*[]models.Review, error) {
 
 	db := r.db.Model(&reviews)
 
-	checkReview := db.Debug().Find(&reviews)
+	checkReview := db.Debug().Preload("User").Find(&reviews)
 
-	if checkReview.RowsAffected > 0 {
-		return nil, errors.New("error")
+	if checkReview.RowsAffected < 1 {
+		return nil, errors.New("at least one review is required")
 	}
 
 	return &reviews, nil
@@ -37,7 +37,7 @@ func (r *reviewRepository) GetByID(reviewID int) (*models.Review, error) {
 
 	checkReview := db.Debug().Where("id = ?", reviewID)
 
-	if checkReview.RowsAffected > 0 {
+	if checkReview.RowsAffected < 1 {
 		return nil, errors.New("failed error")
 	}
 
@@ -45,7 +45,7 @@ func (r *reviewRepository) GetByID(reviewID int) (*models.Review, error) {
 
 }
 
-func (r *reviewRepository) CreateReview(request review.CreateReviewRequest, userID int, productID int) (*models.Review, error) {
+func (r *reviewRepository) CreateReview(request review.CreateReviewRequest) (*models.Review, error) {
 
 	var product models.Product
 	var review models.Review
@@ -57,30 +57,30 @@ func (r *reviewRepository) CreateReview(request review.CreateReviewRequest, user
 
 	dbUser := r.db.Model(user)
 
-	checkUser := dbUser.Debug().Where("id = ?", userID).First(&user)
+	checkUser := dbUser.Debug().Where("id = ?", request.UserID).First(&user)
 
-	if checkUser.RowsAffected > 0 {
+	if checkUser.RowsAffected < 1 {
 		return nil, errors.New("failed user id")
 	}
 
-	checkProduct := dbProduct.Debug().Where("id = ?", productID).First(&product)
+	checkProduct := dbProduct.Debug().Where("id = ?", request.ProductID).First(&product)
 
-	if checkProduct.RowsAffected > 0 {
+	if checkProduct.RowsAffected < 1 {
 		return nil, errors.New("failed product id")
 	}
 
-	checkReview := dbReview.Debug().Where("user_id = ? AND product_id", userID, productID).First(&review)
+	checkReview := dbReview.Debug().Where("user_id = ? AND product_id", request.UserID, request.ProductID).First(&review)
 
-	if checkReview.RowsAffected > 0 {
+	if checkReview.RowsAffected < 1 {
 		return nil, errors.New("failed review")
 	}
 
 	newReview := models.Review{
 		Name:      checkUser.Name(),
-		UserID:    uint(userID),
+		UserID:    uint(request.UserID),
 		Rating:    request.Rating,
 		Comment:   request.Comment,
-		ProductID: uint(productID),
+		ProductID: uint(request.ProductID),
 	}
 
 	if err := dbReview.Debug().Create(&newReview).Error; err != nil {
@@ -89,7 +89,7 @@ func (r *reviewRepository) CreateReview(request review.CreateReviewRequest, user
 
 	var reviews []models.Review
 
-	if err := r.db.Where("product_id = ?", productID).Find(&reviews).Error; err != nil {
+	if err := r.db.Where("product_id = ?", request.ProductID).Find(&reviews).Error; err != nil {
 		return nil, err
 	}
 

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+
+
+message CreateMidtransRequest {
+  int32 gross_amount = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  string phone = 5;
+}
+
+message SnapResponse{
+    string token = 1;
+    string redirect_url = 2;
+    string status_code = 3;
+    repeated string error_messages = 4;
+}
+
+service MidtransService{
+    rpc CreateTransaction(CreateMidtransRequest) returns (SnapResponse);
+}

@@ -16,6 +16,7 @@ type ShippingAddressRequest struct {
 }
 
 type CreateOrderRequest struct {
+	UserID          uint                   `json:"user_id"`
 	Name            string                 `json:"name"`
 	Phone           string                 `json:"phone"`
 	Courier         string                 `json:"courier"`

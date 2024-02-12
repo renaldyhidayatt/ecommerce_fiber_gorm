@@ -19,7 +19,7 @@ func NewProductRepository(db *gorm.DB) *productRepository {
 	return &productRepository{db: db}
 }
 
-func (r *productRepository) GetAllProducts() (*[]models.Product, error) {
+func (r *productRepository) GetProducts() (*[]models.Product, error) {
 	var products []models.Product
 
 	db := r.db.Model(&products)
@@ -33,7 +33,7 @@ func (r *productRepository) GetAllProducts() (*[]models.Product, error) {
 	return &products, nil
 }
 
-func (r *productRepository) GetProductBySlug(slug string) (*models.Product, error) {
+func (r *productRepository) GetProductSlug(slug string) (*models.Product, error) {
 	var product models.Product
 
 	db := r.db.Model(&product)
@@ -63,7 +63,7 @@ func (r *productRepository) CreateProduct(request *product.CreateProductRequest)
 		return nil, errors.New("failed to convert CategoryID to int: " + err.Error())
 	}
 
-	ratingFloat := float64(*request.Rating)
+	ratingFloat := float64(request.Rating)
 
 	product.Name = request.Name
 	product.Description = request.Description
@@ -90,14 +90,14 @@ func (r *productRepository) CreateProduct(request *product.CreateProductRequest)
 	return &product, nil
 }
 
-func (r *productRepository) GetProductByID(productID int) (*models.Product, error) {
+func (r *productRepository) GetProduct(productID int) (*models.Product, error) {
 	var product models.Product
 
 	db := r.db.Model(&product)
 
-	checkProductById := db.Debug().Where("id", productID).First(&product)
+	checkProductById := db.Debug().Where("id = ?", productID).First(&product)
 
-	if checkProductById.RowsAffected < 0 {
+	if checkProductById.RowsAffected < 1 {
 		return nil, errors.New("failed get id")
 	}
 
@@ -113,25 +113,24 @@ func (r *productRepository) MyUpdateQuantity(productID int, quantity int) (bool,
 	if dbProduct.ID != 0 {
 		dbProduct.CountInStock = quantity
 
-		// Menyimpan perubahan ke database
 		if err := r.db.Save(&dbProduct).Error; err != nil {
-			return false, err
+			return false, errors.New("failed update quantity")
 		}
 
 		return true, nil
 	}
 
-	return false, nil
+	return false, errors.New("failed update quantity")
 }
 
-func (r *productRepository) UpdateProduct(productID int, request *product.UpdateProductRequest) (*models.Product, error) {
+func (r *productRepository) UpdateProduct(request *product.UpdateProductRequest) (*models.Product, error) {
 	var product models.Product
 
 	slugProduct := slug.Make(request.Name)
 
 	db := r.db.Model(&product)
 
-	if err := db.Debug().Where("id = ?", productID).First(&product).Error; err != nil {
+	if err := db.Debug().Where("id = ?", request.ID).First(&product).Error; err != nil {
 		return nil, errors.New("failed to find product: " + err.Error())
 	}
 
@@ -158,9 +157,10 @@ func (r *productRepository) UpdateProduct(productID int, request *product.Update
 	product.CountInStock = request.CountInStock
 	product.Rating = ratingFloat
 
-	// Menyimpan perubahan ke database
-	if err := db.Debug().Save(&product).Error; err != nil {
-		return nil, errors.New("failed to update product: " + err.Error())
+	updateProduct := db.Debug().Updates(&product)
+
+	if updateProduct.RowsAffected < 1 {
+		return &product, errors.New("error failed update product")
 	}
 
 	return &product, nil
@@ -169,22 +169,21 @@ func (r *productRepository) UpdateProduct(productID int, request *product.Update
 func (r *productRepository) DeleteProduct(productID int) (*models.Product, error) {
 	var product models.Product
 
-	dbProduct, err := r.GetProductByID(productID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if dbProduct == nil {
-		return nil, errors.New("product not found")
-	}
-
 	db := r.db.Model(&product)
-	if err := db.Debug().Delete(dbProduct).Error; err != nil {
-		return nil, err
+
+	checkProduct := db.Debug().Where("id = ?", productID).First(&product)
+
+	if checkProduct.RowsAffected < 1 {
+		return &product, errors.New("error not found product")
 	}
 
-	return dbProduct, nil
+	deleteProduct := db.Debug().Delete(&product)
+
+	if deleteProduct.RowsAffected < 1 {
+		return &product, errors.New("failed delete product")
+	}
+
+	return &product, nil
 }
 
 func (r *productRepository) CountProduct() (int, error) {

@@ -16,8 +16,8 @@ func NewCategoryService(repository repository.CategoryRepository, mapper mapper.
 	return &categoryService{repository: repository, mapper: mapper}
 }
 
-func (s *categoryService) GetAll() ([]*catresponse.CategoryResponse, error) {
-	res, err := s.repository.GetAll()
+func (s *categoryService) GetCategories() ([]*catresponse.CategoryResponse, error) {
+	res, err := s.repository.GetCategories()
 
 	if err != nil {
 		return nil, err
@@ -27,21 +27,9 @@ func (s *categoryService) GetAll() ([]*catresponse.CategoryResponse, error) {
 	return mapper, nil
 }
 
-func (s *categoryService) GetByID(categoryID int) (*catresponse.CategoryResponse, error) {
+func (s *categoryService) GetCategory(categoryID int) (*catresponse.CategoryResponse, error) {
 
-	res, err := s.repository.GetByID(categoryID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	mapper := s.mapper.ToCategoryResponse(res)
-
-	return mapper, nil
-}
-
-func (s *categoryService) GetBySlug(slug string) (*catresponse.CategoryResponse, error) {
-	res, err := s.repository.GetBySlug(slug)
+	res, err := s.repository.GetCategory(categoryID)
 
 	if err != nil {
 		return nil, err
@@ -52,9 +40,21 @@ func (s *categoryService) GetBySlug(slug string) (*catresponse.CategoryResponse,
 	return mapper, nil
 }
 
-func (s *categoryService) Create(request *category.CreateCategoryRequest) (*catresponse.CategoryResponse, error) {
+func (s *categoryService) GetCategorySlug(slug string) (*catresponse.CategoryResponse, error) {
+	res, err := s.repository.GetCategorySlug(slug)
 
-	res, err := s.repository.Create(request)
+	if err != nil {
+		return nil, err
+	}
+
+	mapper := s.mapper.ToCategoryResponse(res)
+
+	return mapper, nil
+}
+
+func (s *categoryService) CreateCategory(request *category.CreateCategoryRequest) (*catresponse.CategoryResponse, error) {
+
+	res, err := s.repository.CreateCategory(request)
 
 	if err != nil {
 		return nil, err
@@ -66,14 +66,15 @@ func (s *categoryService) Create(request *category.CreateCategoryRequest) (*catr
 
 }
 
-func (s *categoryService) UpdateByID(id int, updateCategory *category.UpdateCategoryRequest) (*catresponse.CategoryResponse, error) {
+func (s *categoryService) UpdateCategory(updateCategory *category.UpdateCategoryRequest) (*catresponse.CategoryResponse, error) {
 
 	category := category.UpdateCategoryRequest{
+		ID:       updateCategory.ID,
 		Name:     updateCategory.Name,
 		FilePath: updateCategory.FilePath,
 	}
 
-	res, err := s.repository.UpdateByID(id, &category)
+	res, err := s.repository.UpdateCategory(&category)
 
 	if err != nil {
 		return nil, err
@@ -84,8 +85,8 @@ func (s *categoryService) UpdateByID(id int, updateCategory *category.UpdateCate
 	return mapper, nil
 }
 
-func (s *categoryService) DeleteByID(categoryID int) (*catresponse.CategoryResponse, error) {
-	res, err := s.repository.DeleteByID(categoryID)
+func (s *categoryService) DeleteCategory(categoryID int) (*catresponse.CategoryResponse, error) {
+	res, err := s.repository.DeleteCategory(categoryID)
 
 	if err != nil {
 		return nil, err

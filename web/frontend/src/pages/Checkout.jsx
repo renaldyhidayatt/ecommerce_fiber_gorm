@@ -51,8 +51,6 @@ const CheckoutForm = () => {
     if (province) {
       dispatch(fetchCities(province));
     }
-
-    console.log('User: ', user);
   }, [province]);
 
   const checkCost = () => {

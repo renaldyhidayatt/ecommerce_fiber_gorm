@@ -33,7 +33,7 @@ func (r *orderRepository) GetAll() (*[]models.Order, error) {
 	return &orders, nil
 }
 
-func (r *orderRepository) CreateOrder(user_id int, request *order.CreateOrderRequest) (*models.Order, error) {
+func (r *orderRepository) CreateOrder(request *order.CreateOrderRequest) (*models.Order, error) {
 	tx := r.db.Begin()
 
 	var userModel models.User
@@ -46,7 +46,7 @@ func (r *orderRepository) CreateOrder(user_id int, request *order.CreateOrderReq
 
 	dbUser := r.db.Model(userModel)
 
-	checkUserByid := dbUser.Debug().Where("id = ?", user_id).First(&userModel)
+	checkUserByid := dbUser.Debug().Where("id = ?", request.UserID).First(&userModel)
 
 	if checkUserByid.RowsAffected < 0 {
 		return nil, errors.New("failed get user id")

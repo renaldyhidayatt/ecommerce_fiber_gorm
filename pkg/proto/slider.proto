@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ecommerce_fiber/internal/pb";
+
+import "google/protobuf/empty.proto";
+
+message Slider {
+    int64 id = 1;
+    string name = 2;
+    string image = 3;
+}
+
+message SliderRequest {
+    int64 id = 1;
+}
+
+message SlidersResponse {
+    repeated Slider sliders = 1;
+}
+
+message SliderResponse{
+    Slider slider = 1;
+}
+
+message CreateSliderRequest {
+    string name = 1;
+    string image = 2;
+}
+
+message UpdateSliderRequest {
+    int64 id = 1;
+    string name = 2;
+    string image = 3;
+}
+
+message DeleteSliderResponse {
+    bool success = 1;
+}
+
+service SliderService {
+    rpc GetSliders(google.protobuf.Empty) returns (SlidersResponse);
+    rpc GetSlider(SliderRequest) returns (SliderResponse);
+    rpc CreateSlider(CreateSliderRequest) returns (SliderResponse);
+    rpc UpdateSlider(UpdateSliderRequest) returns (SliderResponse);
+    rpc DeleteSlider(SliderRequest) returns (DeleteSliderResponse);
+}

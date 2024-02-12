@@ -36,14 +36,14 @@ type Deps struct {
 
 func NewService(deps Deps) *Service {
 	return &Service{
-		Auth:       NewAuthService(deps.Repository.User, deps.Hashing, deps.Logger, deps.Token),
-		User:       NewUserService(deps.Repository.User, deps.Hashing, deps.Logger),
+		Auth:       NewAuthService(deps.Repository.User, deps.Hashing, deps.Logger, deps.Token, deps.Mapper.UserMapper),
+		User:       NewUserService(deps.Repository.User, deps.Hashing, deps.Logger, deps.Mapper.UserMapper),
 		Category:   NewCategoryService(deps.Repository.Category, deps.Mapper.CategoryMapper),
 		Product:    NewProductService(deps.Repository.Product, deps.Logger, deps.Mapper.ProductMapper),
 		Cart:       NewCartService(deps.Repository.Cart, deps.Logger),
 		Order:      NewOrderService(deps.Repository.Order, deps.Logger, deps.Mapper.OrderMapper),
 		Midtrans:   NewMidtransService(deps.Snap),
-		Review:     NewReviewService(deps.Repository.Review),
+		Review:     NewReviewService(deps.Repository.Review, deps.Mapper.ReviewMapper),
 		Slider:     NewSliderService(deps.Repository.Slider, deps.Logger),
 		RajaOngkir: NewRajaOngkirService(deps.RajaOngkir),
 		Dashboard:  NewDashboardService(deps.Repository.User, deps.Repository.Product, deps.Repository.Order),
