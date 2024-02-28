@@ -5,11 +5,11 @@ import (
 	"ecommerce_fiber/pkg/auth"
 	"ecommerce_fiber/pkg/cloudinary"
 	mylogger "ecommerce_fiber/pkg/logger"
-
+ _ "ecommerce_fiber/docs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-
+"github.com/gofiber/swagger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -72,6 +72,8 @@ func (h *HandlerApi) Init() *fiber.App {
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
+
+  router.Get("/docs", swagger.HandlerDefault)
 
 	h.initApi(router)
 
